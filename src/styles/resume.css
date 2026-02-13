@@ -1,0 +1,249 @@
+/* ─── Resume Paper Styles ─── */
+/* These styles are scoped to the A4 preview and used by Puppeteer for PDF */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+.a4-page {
+    width: 210mm;
+    min-height: 297mm;
+    background: white;
+    color: #1a1a1a;
+    padding: 10mm 14mm;
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 9pt;
+    line-height: 1.35;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+/* ─── Header ─── */
+.resume-header {
+    text-align: center;
+    margin-bottom: 4mm;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.resume-name {
+    font-size: 18pt;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #111;
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+
+.resume-contact-line {
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 0;
+    font-size: 7pt;
+    color: #555;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.resume-contact-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.resume-contact-icon {
+    display: inline-flex;
+    align-items: center;
+    color: #1a5276;
+    flex-shrink: 0;
+}
+
+.resume-contact-icon svg {
+    width: 8px;
+    height: 8px;
+}
+
+.resume-contact-separator {
+    color: #1a5276;
+    font-size: 7pt;
+    line-height: 1;
+    margin: 0 4px;
+    font-weight: 700;
+}
+
+.resume-contact-link {
+    color: #555;
+    text-decoration: none;
+}
+
+.resume-contact-link:hover {
+    color: #111;
+}
+
+/* ─── Sections ─── */
+.resume-section {
+    margin-bottom: 3mm;
+}
+
+.resume-section-title {
+    font-size: 10pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #1a5276;
+    border-bottom: 1.5px solid #1a5276;
+    padding-bottom: 1px;
+    margin-bottom: 2mm;
+}
+
+/* ─── Experience & Education Items ─── */
+.resume-entry {
+    margin-bottom: 2mm;
+}
+
+.resume-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0;
+}
+
+.resume-entry-title {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.resume-entry-date {
+    font-size: 8pt;
+    color: #666;
+    white-space: nowrap;
+    font-style: italic;
+}
+
+.resume-entry-subtitle {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 8.5pt;
+    color: #444;
+    margin-bottom: 1mm;
+}
+
+.resume-entry-org {
+    font-style: italic;
+}
+
+.resume-entry-location {
+    font-size: 8pt;
+    color: #666;
+}
+
+/* ─── Bullet Points ─── */
+.resume-bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.resume-bullets li {
+    position: relative;
+    padding-left: 3.5mm;
+    margin-bottom: 0.3px;
+    font-size: 9pt;
+    line-height: 1.35;
+    color: #333;
+}
+
+.resume-bullets li::before {
+    content: '·';
+    position: absolute;
+    left: 0;
+    color: #555;
+    font-weight: 700;
+}
+
+/* ─── Skills ─── */
+.resume-skills-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.resume-skill-row {
+    display: flex;
+    gap: 2mm;
+    line-height: 1.4;
+}
+
+.resume-skill-category {
+    font-weight: 600;
+    font-size: 9pt;
+    color: #1a1a1a;
+    flex-shrink: 0;
+}
+
+.resume-skill-items {
+    font-size: 9pt;
+    color: #333;
+}
+
+/* ─── Summary ─── */
+.resume-summary-text {
+    font-size: 9pt;
+    line-height: 1.4;
+    color: #333;
+}
+
+/* ─── Project Items ─── */
+.resume-project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.resume-project-title {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.resume-project-tech {
+    font-size: 8pt;
+    color: #666;
+    font-style: italic;
+}
+
+.resume-project-url {
+    font-size: 7.5pt;
+    color: #1a5276;
+    text-decoration: underline;
+}
+
+/* ─── Print Styles ─── */
+@media print {
+    @page {
+        size: A4;
+        margin: 0;
+    }
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .a4-page {
+        box-shadow: none;
+        min-height: auto;
+    }
+}
+
+/* ─── Empty Section Placeholder ─── */
+.resume-empty-hint {
+    color: #bbb;
+    font-style: italic;
+    font-size: 9pt;
+}

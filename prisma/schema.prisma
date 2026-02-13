@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Resume {
+  id         String       @id @default(uuid())
+  title      String
+  summary    String?
+  templateId    String       @default("standard")
+  sectionOrder  String       @default("summary,skills,education,experience,projects")
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  contact        Contact?
+  experience     Experience[]
+  projects       Project[]
+  education      Education[]
+  skills         Skill[]
+  customSections CustomSection[]
+}
+
+model CustomSection {
+  id       String @id @default(uuid())
+  resumeId String
+  resume   Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  title    String @default("")
+  items    String @default("[]")
+  order    Int    @default(0)
+}
+
+model Contact {
+  id        String @id @default(uuid())
+  resumeId  String @unique
+  resume    Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  firstName String @default("")
+  lastName  String @default("")
+  email     String @default("")
+  phone     String @default("")
+  linkedin  String @default("")
+  website   String @default("")
+  country   String @default("")
+  city      String @default("")
+}
+
+model Experience {
+  id        String  @id @default(uuid())
+  resumeId  String
+  resume    Resume  @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  role      String  @default("")
+  company   String  @default("")
+  location  String  @default("")
+  startDate String  @default("")
+  endDate   String  @default("")
+  isCurrent Boolean @default(false)
+  bullets   String  @default("")
+  order     Int     @default(0)
+}
+
+model Project {
+  id          String @id @default(uuid())
+  resumeId    String
+  resume      Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  name        String @default("")
+  description String @default("")
+  technologies String @default("")
+  url         String @default("")
+  bullets     String @default("")
+  order       Int    @default(0)
+}
+
+model Education {
+  id        String @id @default(uuid())
+  resumeId  String
+  resume    Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  degree    String @default("")
+  school    String @default("")
+  location  String @default("")
+  startDate String @default("")
+  endDate   String @default("")
+  gpa       String @default("")
+  bullets   String @default("")
+  order     Int    @default(0)
+}
+
+model Skill {
+  id       String @id @default(uuid())
+  resumeId String
+  resume   Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  category String @default("")
+  items    String @default("")
+  order    Int    @default(0)
+}
