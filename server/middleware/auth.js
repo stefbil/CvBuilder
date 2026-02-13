@@ -1,9 +1,16 @@
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-dev-key';
+let JWT_SECRET = process.env.JWT_SECRET;
 
-if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
-    throw new Error('FATAL: JWT_SECRET environment variable is required in production!');
+if (!JWT_SECRET) {
+    if (process.env.NODE_ENV === 'production') {
+        console.warn('⚠️ WARNING: JWT_SECRET not set in production! Generating temporary secret.');
+        console.warn('   Sessions will be invalidated on server restart.');
+        JWT_SECRET = crypto.randomBytes(32).toString('hex');
+    } else {
+        JWT_SECRET = 'super-secret-dev-key';
+    }
 }
 
 export function authenticateToken(req, res, next) {

@@ -16,6 +16,9 @@ dist-ssr
 prisma/*.db
 prisma/*.db-journal
 
+#Markdowns
+*.md
+
 # Environment
 .env
 .env.local
