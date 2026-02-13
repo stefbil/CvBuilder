@@ -13,9 +13,11 @@
   },
   "dependencies": {
     "@prisma/client": "6.19.2",
+    "bcryptjs": "^3.0.3",
     "concurrently": "^9.2.1",
     "cors": "^2.8.6",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "puppeteer": "^24.37.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

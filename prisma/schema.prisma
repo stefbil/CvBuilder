@@ -7,12 +7,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+  resumes      Resume[]
+}
+
 model Resume {
-  id         String       @id @default(uuid())
-  title      String
-  summary    String?
-  templateId    String       @default("standard")
-  sectionOrder  String       @default("summary,skills,education,experience,projects")
+  id            String   @id @default(uuid())
+  title         String   @default("Untitled Resume")
+  
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  templateId    String   @default("standard")
+  summary       String?
+  sectionOrder  String?  @default("summary,skills,education,experience,projects")
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 

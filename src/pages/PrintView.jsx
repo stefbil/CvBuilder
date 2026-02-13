@@ -12,8 +12,18 @@ export default function PrintView() {
 
     useEffect(() => {
         async function load() {
+            // Check for injected data (from Puppeteer)
+            if (window.__RESUME_DATA__) {
+                setResume(window.__RESUME_DATA__)
+                return
+            }
+
             try {
+                // Try fetching - this might fail if protected and no token, 
+                // but currently PrintView is public-ish or we can pass token in URL if needed.
+                // For now, let's try standard fetch.
                 const res = await fetch(`/api/resumes/${id}`)
+                if (!res.ok) throw new Error('Resume not found')
                 const data = await res.json()
                 setResume(data)
             } catch (err) {
