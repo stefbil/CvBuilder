@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { apiFetch } from '../utils/api'
-import { exportToPDF } from '../utils/pdfExport'
+import { saveResume, getResume } from '../utils/api'
+import ResumePDF from '../components/ResumePDF'
+import { PDFDownloadLink } from '@react-pdf/renderer'
 import ContactForm from '../components/forms/ContactForm'
 import ExperienceForm from '../components/forms/ExperienceForm'
 import EducationForm from '../components/forms/EducationForm'
@@ -44,9 +45,7 @@ export default function Editor() {
 
     async function fetchResume() {
         try {
-            const res = await apiFetch(`/api/resumes/${id}`)
-            if (!res.ok) throw new Error('Resume not found')
-            const data = await res.json()
+            const data = await getResume(id)
             setResume(data)
             resumeRef.current = data
         } catch (err) {
@@ -60,13 +59,8 @@ export default function Editor() {
     const saveResume = useCallback(async (data) => {
         setSaveStatus('saving')
         try {
-            const res = await apiFetch(`/api/resumes/${id}`, {
-                method: 'PUT',
-                body: JSON.stringify(data),
-            })
-            if (res.ok) {
-                setSaveStatus('saved')
-            }
+            await saveResume(id, data)
+            setSaveStatus('saved')
         } catch (err) {
             console.error('Save failed:', err)
             setSaveStatus('unsaved')
@@ -144,11 +138,7 @@ export default function Editor() {
         setActiveTab(newId)
     }
 
-    async function handleDownloadPDF() {
-        // Ensure latest changes are saved before printing (optional, but good practice)
-        await saveResume(resumeRef.current)
-        exportToPDF()
-    }
+    // function handleDownloadPDF() { ... } // Replaced by PDFDownloadLink
 
     if (loading) {
         return (
@@ -201,7 +191,7 @@ export default function Editor() {
                         <span className="editor-toolbar-title">{resume.title}</span>
                     </div>
                     <div className="editor-toolbar-actions">
-                        <span className={`save-indicator ${saveStatus === 'saving' ? 'saving' : ''}`}>
+                        <span className={`save - indicator ${saveStatus === 'saving' ? 'saving' : ''} `}>
                             {saveStatus === 'saved' && '✓ Saved'}
                             {saveStatus === 'saving' && '⟳ Saving...'}
                             {saveStatus === 'unsaved' && '● Unsaved'}
@@ -227,12 +217,15 @@ export default function Editor() {
                                 <path d="M4 2v10M4 2L2 4M4 2l2 2M10 12V2M10 12l-2-2M10 12l2-2" />
                             </svg>
                         </button>
-                        <button className="btn btn-primary btn-sm" onClick={handleDownloadPDF}>
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                <path d="M7 2v8M4 7l3 3 3-3M2 11.5h10" />
-                            </svg>
-                            PDF
-                        </button>
+
+                        <PDFDownloadLink
+                            document={<ResumePDF resume={resume} />}
+                            fileName={`${resume.contact?.firstName || 'Resume'}_${resume.contact?.lastName || ''}.pdf`}
+                            className="btn btn-primary"
+                            style={{ textDecoration: 'none', color: 'white' }}
+                        >
+                            {({ blob, url, loading, error }) => (loading ? 'Preparing PDF...' : 'Download PDF')}
+                        </PDFDownloadLink>
                     </div>
                 </div>
 
@@ -308,7 +301,7 @@ export default function Editor() {
                     {tabs.map(tab => (
                         <button
                             key={tab.id}
-                            className={`editor-tab ${activeTab === tab.id ? 'active' : ''}`}
+                            className={`editor - tab ${activeTab === tab.id ? 'active' : ''} `}
                             onClick={() => setActiveTab(tab.id)}
                         >
                             {tab.label}

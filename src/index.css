@@ -21,54 +21,6 @@
   --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
 }
 
-/* ─── Print Styles for Native Export ─── */
-@media print {
-
-  .editor-sidebar,
-  .editor-toolbar,
-  .editor-tabs,
-  .btn,
-  .btn-icon,
-  .page-break-marker {
-    display: none !important;
-  }
-
-  .editor-layout {
-    height: auto;
-    overflow: visible;
-    display: block;
-  }
-
-  .preview-pane {
-    background: white;
-    padding: 0;
-    overflow: visible;
-    display: block;
-  }
-
-  .preview-container {
-    width: 100%;
-    margin: 0;
-  }
-
-  .a4-page {
-    width: 100%;
-    margin: 0;
-    box-shadow: none;
-    min-height: auto;
-    /* Ensure page breaks work */
-    page-break-after: always;
-  }
-
-  /* Reset body margins */
-  body,
-  #root {
-    margin: 0;
-    padding: 0;
-    background: white;
-  }
-}
-
 * {
   margin: 0;
   padding: 0;

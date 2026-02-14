@@ -1,4 +1,0 @@
-
-export function exportToPDF() {
-    window.print();
-}
