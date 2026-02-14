@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { saveResume, getResume } from '../utils/api'
 import ResumePDF from '../components/ResumePDF'
 import { PDFDownloadLink } from '@react-pdf/renderer'
-import { User, Briefcase, GraduationCap, FolderGit2, Wrench, FileText, Layers, ArrowLeft, Download, Eye, EyeOff, List, ChevronUp, ChevronDown, Trash2, Plus, ArrowRight } from 'lucide-react'
+import { User, Briefcase, GraduationCap, FolderGit2, Wrench, FileText, Layers, ArrowLeft, Download, Eye, EyeOff, List, ChevronUp, ChevronDown, Trash2, Plus, ArrowRight, X, Edit2, Settings } from 'lucide-react'
 import ContactForm from '../components/forms/ContactForm'
 import ExperienceForm from '../components/forms/ExperienceForm'
 import EducationForm from '../components/forms/EducationForm'
@@ -44,7 +44,7 @@ export default function Editor() {
     const [activeTab, setActiveTab] = useState('contact')
     const [saveStatus, setSaveStatus] = useState('saved')
     const [loading, setLoading] = useState(true)
-    const [showReorder, setShowReorder] = useState(false)
+    const [isReorderMode, setIsReorderMode] = useState(false)
     const [showPageBreaks, setShowPageBreaks] = useState(false)
     const saveTimerRef = useRef(null)
     const resumeRef = useRef(null)
@@ -118,21 +118,25 @@ export default function Editor() {
         return cs?.title || 'Custom Section'
     }
 
-    function moveSectionUp(index) {
+    function moveSectionUp(index, e) {
+        e.stopPropagation()
         if (index <= 0) return
         const newOrder = [...sectionOrder]
             ;[newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]]
         updateResume({ sectionOrder: newOrder.join(',') })
     }
 
-    function moveSectionDown(index) {
+    function moveSectionDown(index, e) {
+        e.stopPropagation()
         if (index >= sectionOrder.length - 1) return
         const newOrder = [...sectionOrder]
             ;[newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]]
         updateResume({ sectionOrder: newOrder.join(',') })
     }
 
-    function removeSection(key) {
+    function removeSection(key, e) {
+        e.stopPropagation()
+        if (!window.confirm('Are you sure you want to remove this section?')) return
         const newOrder = sectionOrder.filter(k => k !== key)
         const newCustom = customSections.filter(cs => cs.id !== key)
         updateResume({
@@ -156,6 +160,8 @@ export default function Editor() {
             sectionOrder: newOrder.join(','),
         })
         setActiveTab(newId)
+        // Ensure we are not in reorder mode so the user can edit immediately
+        // setIsReorderMode(false) 
     }
 
     if (loading) {
@@ -170,11 +176,12 @@ export default function Editor() {
 
     // Build tabs: Contact is always first, then the ordered sections
     const tabs = [
-        { id: 'contact', label: 'Contact', Icon: SECTION_ICONS.contact },
+        { id: 'contact', label: 'Contact', Icon: SECTION_ICONS.contact, isFixed: true },
         ...sectionOrder.map(key => ({
             id: key,
             label: getSectionLabel(key),
-            Icon: SECTION_ICONS[key] || Layers
+            Icon: SECTION_ICONS[key] || Layers,
+            isCustom: isCustomSection(key)
         })),
     ]
 
@@ -241,14 +248,6 @@ export default function Editor() {
                         >
                             {showPageBreaks ? <Eye size={18} /> : <EyeOff size={18} />}
                         </button>
-                        <button
-                            className="btn-icon"
-                            onClick={() => setShowReorder(!showReorder)}
-                            title="Reorder sections"
-                            style={showReorder ? { borderColor: 'var(--accent)', color: 'var(--accent)' } : {}}
-                        >
-                            <List size={18} />
-                        </button>
 
                         <PDFDownloadLink
                             document={<ResumePDF resume={resume} />}
@@ -270,51 +269,78 @@ export default function Editor() {
                 <div className="editor-content-wrapper">
                     {/* Vertical Sidebar */}
                     <div className="vertical-nav" ref={navRef}>
-                        <div className="nav-header">Sections</div>
+                        <div className="nav-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span>Sections</span>
+                            <button
+                                className="btn-icon-tiny"
+                                onClick={() => setIsReorderMode(!isReorderMode)}
+                                title={isReorderMode ? "Done Reordering" : "Reorder Sections"}
+                                style={isReorderMode ? { color: 'var(--accent)', background: 'rgba(99, 102, 241, 0.1)' } : {}}
+                            >
+                                {isReorderMode ? <X size={14} /> : <Settings size={14} />}
+                            </button>
+                        </div>
                         <div className="nav-items">
-                            {tabs.map(tab => (
-                                <button
-                                    key={tab.id}
-                                    className={`nav-item ${activeTab === tab.id ? 'active' : ''}`}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    title={tab.label}
-                                >
-                                    {tab.Icon && <tab.Icon size={18} />}
-                                    <span>{tab.label}</span>
-                                </button>
-                            ))}
+                            {tabs.map((tab, index) => {
+                                // Calculate index in sectionOrder array (excluding 'contact')
+                                const orderIndex = index - 1
+
+                                return (
+                                    <div key={tab.id} style={{ position: 'relative' }}>
+                                        <button
+                                            className={`nav-item ${activeTab === tab.id ? 'active' : ''}`}
+                                            onClick={() => setActiveTab(tab.id)}
+                                            title={tab.label}
+                                            style={isReorderMode && !tab.isFixed ? { paddingRight: '60px' } : {}}
+                                        >
+                                            {tab.Icon && <tab.Icon size={18} />}
+                                            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                {tab.label}
+                                            </span>
+                                        </button>
+
+                                        {isReorderMode && !tab.isFixed && (
+                                            <div className="nav-item-actions">
+                                                <button
+                                                    className="nav-action-btn"
+                                                    onClick={(e) => moveSectionUp(orderIndex, e)}
+                                                    disabled={orderIndex === 0}
+                                                    title="Move Up"
+                                                >
+                                                    <ChevronUp size={12} />
+                                                </button>
+                                                <button
+                                                    className="nav-action-btn"
+                                                    onClick={(e) => moveSectionDown(orderIndex, e)}
+                                                    disabled={orderIndex === sectionOrder.length - 1}
+                                                    title="Move Down"
+                                                >
+                                                    <ChevronDown size={12} />
+                                                </button>
+                                                {tab.isCustom && (
+                                                    <button
+                                                        className="nav-action-btn delete"
+                                                        onClick={(e) => removeSection(tab.id, e)}
+                                                        title="Remove Section"
+                                                    >
+                                                        <Trash2 size={12} />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                )
+                            })}
+
+                            <button className="nav-item add-section-btn" onClick={addCustomSection}>
+                                <Plus size={16} />
+                                <span>Add Section</span>
+                            </button>
                         </div>
                     </div>
 
                     {/* Form Container */}
                     <div className="form-container">
-                        {showReorder && (
-                            <div className="section-reorder-panel mb-6">
-                                <div className="section-reorder-header">
-                                    <span>Section Order</span>
-                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Drag to reorder or use arrows</span>
-                                </div>
-                                {sectionOrder.map((key, index) => (
-                                    <div key={key} className="section-reorder-item">
-                                        <span className="section-reorder-label">
-                                            {getSectionLabel(key)}
-                                            {isCustomSection(key) && <span className="text-xs text-muted-foreground ml-2">(custom)</span>}
-                                        </span>
-                                        <div className="section-reorder-actions">
-                                            <button className="btn-icon" onClick={() => moveSectionUp(index)} disabled={index === 0}><ChevronUp size={14} /></button>
-                                            <button className="btn-icon" onClick={() => moveSectionDown(index)} disabled={index === sectionOrder.length - 1}><ChevronDown size={14} /></button>
-                                            {isCustomSection(key) && (
-                                                <button className="btn-icon text-red-500" onClick={() => removeSection(key)}><Trash2 size={14} /></button>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                                <button className="add-item-btn mt-2 w-full flex justify-center gap-2" onClick={addCustomSection}>
-                                    <Plus size={16} /> Add Custom Section
-                                </button>
-                            </div>
-                        )}
-
                         <div className="form-content">
                             {renderForm()}
                         </div>
