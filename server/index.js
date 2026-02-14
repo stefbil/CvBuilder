@@ -37,10 +37,21 @@ app.get('/health', (req, res) => {
 
 // Catch-all route to serve index.html for client-side routing
 app.get('*', (req, res) => {
-    res.sendFile(join(__dirname, '../dist/index.html'));
+    const indexPath = join(__dirname, '../dist/index.html');
+    if (!fs.existsSync(indexPath)) {
+        console.error('Index file not found at:', indexPath);
+        return res.status(404).send('Index file not found (server misconfiguration)');
+    }
+    res.sendFile(indexPath, (err) => {
+        if (err) {
+            console.error('Error sending index.html:', err);
+            res.status(500).send('Error serving app');
+        }
+    });
 });
 
 // Start server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Serving static files from: ${distPath}`);
 });
