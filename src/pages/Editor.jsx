@@ -179,6 +179,8 @@ export default function Editor() {
         return null
     }
 
+    const isCustomSection = (key) => !BUILTIN_LABELS[key]
+
     // Build tabs: Contact is always first, then the ordered sections
     const tabs = [
         { id: 'contact', label: 'Contact', Icon: SECTION_ICONS.contact, isFixed: true },
@@ -189,8 +191,6 @@ export default function Editor() {
             isCustom: isCustomSection(key)
         })),
     ]
-
-    const isCustomSection = (key) => !BUILTIN_LABELS[key]
 
     const handleNext = () => {
         const currentIndex = tabs.findIndex(t => t.id === activeTab)
