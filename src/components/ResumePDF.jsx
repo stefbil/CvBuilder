@@ -37,11 +37,12 @@ const styles = StyleSheet.create({
         display: 'flex',
         alignItems: 'center',
         flexWrap: 'wrap',
-        gap: 4,
+        // gap: 4, // Removed to rely on separator margins and avoid assymetry
     },
     contactItem: {
         flexDirection: 'row',
         alignItems: 'center',
+        marginBottom: 2, // Space between wrapped lines
     },
     contactText: {
         fontSize: 8,
@@ -52,7 +53,7 @@ const styles = StyleSheet.create({
         color: '#555',
     },
     separator: {
-        marginHorizontal: 4,
+        marginHorizontal: 8, // Increased from 4
         color: '#cbd5e1',
         fontSize: 8,
     },
@@ -61,6 +62,8 @@ const styles = StyleSheet.create({
         height: 10,
         marginRight: 4,
         color: '#555',
+        // Ensure icon is centered vertically with text
+        marginTop: -1,
     },
     section: {
         marginBottom: 10,
@@ -359,7 +362,9 @@ export default function ResumePDF({ resume }) {
                                     ) : (
                                         <Text style={styles.contactText}>{item.text}</Text>
                                     )}
-                                    {i < contactItems.length - 1 && <Text style={styles.separator}>•</Text>}
+                                    {i < contactItems.length - 1 && (
+                                        <Text style={styles.separator}>•</Text>
+                                    )}
                                 </View>
                             ))}
                         </View>
