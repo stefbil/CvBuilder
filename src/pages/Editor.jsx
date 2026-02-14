@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { saveResume, getResume } from '../utils/api'
 import ResumePDF from '../components/ResumePDF'
 import { PDFDownloadLink } from '@react-pdf/renderer'
+import { User, Briefcase, GraduationCap, FolderGit2, Wrench, FileText, Layers, ArrowLeft, Download, Eye, EyeOff, List, ChevronUp, ChevronDown, Trash2, Plus } from 'lucide-react'
 import ContactForm from '../components/forms/ContactForm'
 import ExperienceForm from '../components/forms/ExperienceForm'
 import EducationForm from '../components/forms/EducationForm'
@@ -19,6 +20,15 @@ const BUILTIN_LABELS = {
     education: 'Education',
     projects: 'Projects',
     skills: 'Skills',
+}
+
+const SECTION_ICONS = {
+    contact: User,
+    summary: FileText,
+    experience: Briefcase,
+    education: GraduationCap,
+    projects: FolderGit2,
+    skills: Wrench,
 }
 
 const DEFAULT_SECTION_ORDER = ['summary', 'skills', 'education', 'experience', 'projects']
@@ -152,8 +162,12 @@ export default function Editor() {
 
     // Build tabs: Contact is always first, then the ordered sections
     const tabs = [
-        { id: 'contact', label: 'Contact' },
-        ...sectionOrder.map(key => ({ id: key, label: getSectionLabel(key) })),
+        { id: 'contact', label: 'Contact', Icon: SECTION_ICONS.contact },
+        ...sectionOrder.map(key => ({
+            id: key,
+            label: getSectionLabel(key),
+            Icon: SECTION_ICONS[key] || Layers
+        })),
     ]
 
     const isCustomSection = (key) => !BUILTIN_LABELS[key]
@@ -184,14 +198,12 @@ export default function Editor() {
                             onClick={() => navigate('/')}
                             title="Back to dashboard"
                         >
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M10 12L6 8l4-4" />
-                            </svg>
+                            <ArrowLeft size={18} />
                         </button>
                         <span className="editor-toolbar-title">{resume.title}</span>
                     </div>
                     <div className="editor-toolbar-actions">
-                        <span className={`save - indicator ${saveStatus === 'saving' ? 'saving' : ''} `}>
+                        <span className={`save-indicator ${saveStatus === 'saving' ? 'saving' : ''} `}>
                             {saveStatus === 'saved' && '✓ Saved'}
                             {saveStatus === 'saving' && '⟳ Saving...'}
                             {saveStatus === 'unsaved' && '● Unsaved'}
@@ -202,10 +214,7 @@ export default function Editor() {
                             title="Toggle Page Breaks"
                             style={showPageBreaks ? { borderColor: 'var(--accent)', color: 'var(--accent)' } : {}}
                         >
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                <rect x="2.5" y="2.5" width="9" height="9" rx="1" />
-                                <path d="M2.5 7h9" strokeDasharray="2 2" />
-                            </svg>
+                            {showPageBreaks ? <Eye size={18} /> : <EyeOff size={18} />}
                         </button>
                         <button
                             className="btn-icon"
@@ -213,9 +222,7 @@ export default function Editor() {
                             title="Reorder sections"
                             style={showReorder ? { borderColor: 'var(--accent)', color: 'var(--accent)' } : {}}
                         >
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                <path d="M4 2v10M4 2L2 4M4 2l2 2M10 12V2M10 12l-2-2M10 12l2-2" />
-                            </svg>
+                            <List size={18} />
                         </button>
 
                         <PDFDownloadLink
@@ -224,7 +231,12 @@ export default function Editor() {
                             className="btn btn-primary"
                             style={{ textDecoration: 'none', color: 'white' }}
                         >
-                            {({ blob, url, loading, error }) => (loading ? 'Preparing PDF...' : 'Download PDF')}
+                            {({ blob, url, loading, error }) => (
+                                <div className="flex items-center gap-2">
+                                    <Download size={16} />
+                                    <span>{loading ? 'Preparing...' : 'PDF'}</span>
+                                </div>
+                            )}
                         </PDFDownloadLink>
                     </div>
                 </div>
@@ -239,11 +251,14 @@ export default function Editor() {
                         {sectionOrder.map((key, index) => (
                             <div key={key} className="section-reorder-item">
                                 <span className="section-reorder-label">
-                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" style={{ color: 'var(--text-muted)' }}>
-                                        <circle cx="4" cy="3" r="1" /><circle cx="8" cy="3" r="1" />
-                                        <circle cx="4" cy="6" r="1" /><circle cx="8" cy="6" r="1" />
-                                        <circle cx="4" cy="9" r="1" /><circle cx="8" cy="9" r="1" />
-                                    </svg>
+                                    <div className="text-muted-foreground">
+                                        {/* Simple dot grid icon replacement */}
+                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" style={{ opacity: 0.5 }}>
+                                            <circle cx="4" cy="3" r="1" /><circle cx="8" cy="3" r="1" />
+                                            <circle cx="4" cy="6" r="1" /><circle cx="8" cy="6" r="1" />
+                                            <circle cx="4" cy="9" r="1" /><circle cx="8" cy="9" r="1" />
+                                        </svg>
+                                    </div>
                                     {getSectionLabel(key)}
                                     {isCustomSection(key) && (
                                         <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>custom</span>
@@ -257,9 +272,7 @@ export default function Editor() {
                                         disabled={index === 0}
                                         title="Move up"
                                     >
-                                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                            <path d="M2 7l3-4 3 4" />
-                                        </svg>
+                                        <ChevronUp size={14} />
                                     </button>
                                     <button
                                         className="btn-icon"
@@ -268,9 +281,7 @@ export default function Editor() {
                                         disabled={index === sectionOrder.length - 1}
                                         title="Move down"
                                     >
-                                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                            <path d="M2 3l3 4 3-4" />
-                                        </svg>
+                                        <ChevronDown size={14} />
                                     </button>
                                     {isCustomSection(key) && (
                                         <button
@@ -279,9 +290,7 @@ export default function Editor() {
                                             onClick={() => removeSection(key)}
                                             title="Delete section"
                                         >
-                                            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                                <path d="M2 2l6 6M8 2l-6 6" />
-                                            </svg>
+                                            <Trash2 size={14} />
                                         </button>
                                     )}
                                 </div>
@@ -290,9 +299,9 @@ export default function Editor() {
                         <button
                             className="add-item-btn"
                             onClick={addCustomSection}
-                            style={{ marginTop: '8px', width: '100%' }}
+                            style={{ marginTop: '8px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                         >
-                            + Add Custom Section
+                            <Plus size={16} /> Add Custom Section
                         </button>
                     </div>
                 )}
@@ -301,10 +310,12 @@ export default function Editor() {
                     {tabs.map(tab => (
                         <button
                             key={tab.id}
-                            className={`editor - tab ${activeTab === tab.id ? 'active' : ''} `}
+                            className={`editor-tab ${activeTab === tab.id ? 'active' : ''} `}
                             onClick={() => setActiveTab(tab.id)}
+                            title={tab.label}
                         >
-                            {tab.label}
+                            {tab.Icon && <tab.Icon size={16} />}
+                            <span>{tab.label}</span>
                         </button>
                     ))}
                 </div>

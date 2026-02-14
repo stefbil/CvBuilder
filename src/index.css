@@ -416,35 +416,50 @@ label {
 /* ─── Tabs ─── */
 .editor-tabs {
   display: flex;
-  padding: 0 24px;
-  gap: 0;
+  padding: 12px 24px;
+  gap: 8px;
   border-bottom: 1px solid var(--border);
   background: var(--bg-primary);
   flex-shrink: 0;
   overflow-x: auto;
+  /* Hide scrollbar for cleaner look but allow scroll */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.editor-tabs::-webkit-scrollbar {
+  display: none;
+  /* Chrome/Safari */
 }
 
 .editor-tab {
-  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
   font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-muted);
-  border: none;
-  background: none;
+  border: 1px solid transparent;
+  background: transparent;
   cursor: pointer;
-  border-bottom: 2px solid transparent;
+  border-radius: 20px;
+  /* Pill shape */
   transition: all 0.2s;
   white-space: nowrap;
   font-family: 'Inter', sans-serif;
 }
 
 .editor-tab:hover {
-  color: var(--text-secondary);
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
 }
 
 .editor-tab.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
+  color: white;
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
 }
 
 /* ─── Form Panel ─── */
