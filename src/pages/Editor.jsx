@@ -201,6 +201,30 @@ export default function Editor() {
         }
     }
 
+    const [draggedIndex, setDraggedIndex] = useState(null)
+
+    const handleDragStart = (e, index) => {
+        setDraggedIndex(index)
+        e.dataTransfer.effectAllowed = "move"
+    }
+
+    const handleDragOver = (e, index) => {
+        e.preventDefault()
+        e.dataTransfer.dropEffect = "move"
+    }
+
+    const handleDrop = (e, index) => {
+        e.preventDefault()
+        if (draggedIndex === null || draggedIndex === index) return
+
+        const newOrder = [...sectionOrder]
+        const [movedItem] = newOrder.splice(draggedIndex, 1)
+        newOrder.splice(index, 0, movedItem)
+
+        updateResume({ sectionOrder: newOrder.join(',') })
+        setDraggedIndex(null)
+    }
+
     const renderForm = () => {
         const props = { resume, updateResume }
         switch (activeTab) {
@@ -249,24 +273,19 @@ export default function Editor() {
                             {showPageBreaks ? <Eye size={18} /> : <EyeOff size={18} />}
                         </button>
 
-                        {/* 
-<PDFDownloadLink
-    document={<ResumePDF resume={resume} />}
-    fileName={`${resume.contact?.firstName || 'Resume'}_${resume.contact?.lastName || ''}.pdf`}
-    className="btn btn-primary"
-    style={{ textDecoration: 'none', color: 'white' }}
->
-    {({ blob, url, loading, error }) => (
-        <div className="flex items-center gap-2">
-            <Download size={16} />
-            <span>{loading ? 'Preparing...' : 'PDF'}</span>
-        </div>
-    )}
-</PDFDownloadLink> 
-*/}
-                        <button className="btn btn-primary" onClick={() => alert('PDF generation disabled for debugging')}>
-                            <Download size={16} /> PDF
-                        </button>
+                        <PDFDownloadLink
+                            document={<ResumePDF resume={resume} />}
+                            fileName={`${resume.contact?.firstName || 'Resume'}_${resume.contact?.lastName || ''}.pdf`}
+                            className="btn btn-primary"
+                            style={{ textDecoration: 'none', color: 'white' }}
+                        >
+                            {({ blob, url, loading, error }) => (
+                                <div className="flex items-center gap-2">
+                                    <Download size={16} />
+                                    <span>{loading ? 'Preparing...' : 'PDF'}</span>
+                                </div>
+                            )}
+                        </PDFDownloadLink>
                     </div>
                 </div>
 
@@ -289,14 +308,27 @@ export default function Editor() {
                             {tabs.map((tab, index) => {
                                 // Calculate index in sectionOrder array (excluding 'contact')
                                 const orderIndex = index - 1
+                                const isDraggable = isReorderMode && !tab.isFixed
 
                                 return (
-                                    <div key={tab.id} style={{ position: 'relative' }}>
+                                    <div
+                                        key={tab.id}
+                                        style={{
+                                            position: 'relative',
+                                            opacity: draggedIndex === orderIndex ? 0.5 : 1,
+                                            transition: 'all 0.2s',
+                                            transform: draggedIndex === orderIndex ? 'scale(0.98)' : 'scale(1)',
+                                        }}
+                                        draggable={isDraggable}
+                                        onDragStart={(e) => isDraggable && handleDragStart(e, orderIndex)}
+                                        onDragOver={(e) => isDraggable && handleDragOver(e, orderIndex)}
+                                        onDrop={(e) => isDraggable && handleDrop(e, orderIndex)}
+                                    >
                                         <button
                                             className={`nav-item ${activeTab === tab.id ? 'active' : ''}`}
                                             onClick={() => setActiveTab(tab.id)}
                                             title={tab.label}
-                                            style={isReorderMode && !tab.isFixed ? { paddingRight: '60px' } : {}}
+                                            style={isReorderMode && !tab.isFixed ? { paddingRight: '60px', cursor: 'grab' } : {}}
                                         >
                                             {tab.Icon && <tab.Icon size={18} />}
                                             <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
