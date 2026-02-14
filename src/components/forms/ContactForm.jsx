@@ -30,7 +30,7 @@ export default function ContactForm({ resume, updateResume }) {
                     <input
                         id="firstName"
                         type="text"
-                        placeholder="e.g. Stefanos"
+                        placeholder="e.g. John"
                         value={contact.firstName || ''}
                         onChange={e => updateName('firstName', e.target.value)}
                     />
@@ -40,7 +40,7 @@ export default function ContactForm({ resume, updateResume }) {
                     <input
                         id="lastName"
                         type="text"
-                        placeholder="e.g. Biliousis"
+                        placeholder="e.g. Doe"
                         value={contact.lastName || ''}
                         onChange={e => updateName('lastName', e.target.value)}
                     />
@@ -63,7 +63,7 @@ export default function ContactForm({ resume, updateResume }) {
                     <input
                         id="phone"
                         type="tel"
-                        placeholder="e.g. +30 694 520 3030"
+                        placeholder="e.g. +1 (555) 123-4567"
                         value={contact.phone || ''}
                         onChange={e => updateContact('phone', e.target.value)}
                     />
@@ -76,7 +76,7 @@ export default function ContactForm({ resume, updateResume }) {
                     <input
                         id="city"
                         type="text"
-                        placeholder="e.g. Copenhagen"
+                        placeholder="e.g. New York"
                         value={contact.city || ''}
                         onChange={e => updateContact('city', e.target.value)}
                     />
@@ -86,7 +86,7 @@ export default function ContactForm({ resume, updateResume }) {
                     <input
                         id="country"
                         type="text"
-                        placeholder="e.g. Denmark"
+                        placeholder="e.g. USA"
                         value={contact.country || ''}
                         onChange={e => updateContact('country', e.target.value)}
                     />
