@@ -249,19 +249,24 @@ export default function Editor() {
                             {showPageBreaks ? <Eye size={18} /> : <EyeOff size={18} />}
                         </button>
 
-                        <PDFDownloadLink
-                            document={<ResumePDF resume={resume} />}
-                            fileName={`${resume.contact?.firstName || 'Resume'}_${resume.contact?.lastName || ''}.pdf`}
-                            className="btn btn-primary"
-                            style={{ textDecoration: 'none', color: 'white' }}
-                        >
-                            {({ blob, url, loading, error }) => (
-                                <div className="flex items-center gap-2">
-                                    <Download size={16} />
-                                    <span>{loading ? 'Preparing...' : 'PDF'}</span>
-                                </div>
-                            )}
-                        </PDFDownloadLink>
+                        {/* 
+<PDFDownloadLink
+    document={<ResumePDF resume={resume} />}
+    fileName={`${resume.contact?.firstName || 'Resume'}_${resume.contact?.lastName || ''}.pdf`}
+    className="btn btn-primary"
+    style={{ textDecoration: 'none', color: 'white' }}
+>
+    {({ blob, url, loading, error }) => (
+        <div className="flex items-center gap-2">
+            <Download size={16} />
+            <span>{loading ? 'Preparing...' : 'PDF'}</span>
+        </div>
+    )}
+</PDFDownloadLink> 
+*/}
+                        <button className="btn btn-primary" onClick={() => alert('PDF generation disabled for debugging')}>
+                            <Download size={16} /> PDF
+                        </button>
                     </div>
                 </div>
 
