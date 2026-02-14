@@ -36,7 +36,7 @@ app.get('/health', (req, res) => {
 });
 
 // Catch-all route to serve index.html for client-side routing
-app.get('*', (req, res) => {
+app.get(/.*/, (req, res) => {
     const indexPath = join(__dirname, '../dist/index.html');
     if (!fs.existsSync(indexPath)) {
         console.error('Index file not found at:', indexPath);
