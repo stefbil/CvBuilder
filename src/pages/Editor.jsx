@@ -164,8 +164,6 @@ export default function Editor() {
         // setIsReorderMode(false) 
     }
 
-    console.log('Editor rendering, resume:', resume)
-
     if (loading) {
         return (
             <div className="editor-layout">
@@ -174,10 +172,7 @@ export default function Editor() {
         )
     }
 
-    if (!resume) {
-        console.log('Resume is null')
-        return null
-    }
+    if (!resume) return null
 
     const isCustomSection = (key) => !BUILTIN_LABELS[key]
 
