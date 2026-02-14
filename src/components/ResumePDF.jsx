@@ -27,9 +27,9 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 24,
         fontWeight: 'bold', // Helvetica-Bold
-        color: '#1a5276',
+        color: '#000000', // Black
         marginBottom: 5,
-        textTransform: 'uppercase',
+        // textTransform: 'uppercase', // Removed to match reference
     },
     contactLine: {
         flexDirection: 'row',
@@ -53,9 +53,9 @@ const styles = StyleSheet.create({
         color: '#555',
     },
     separator: {
-        marginHorizontal: 8, // Increased from 4
-        color: '#cbd5e1',
-        fontSize: 8,
+        marginHorizontal: 8,
+        color: '#94a3b8',
+        fontSize: 10, // Slightly larger dot
     },
     icon: {
         width: 10,
