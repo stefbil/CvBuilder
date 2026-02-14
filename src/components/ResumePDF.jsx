@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
         marginBottom: 2, // Space between wrapped lines
     },
     contactText: {
-        fontSize: 8,
+        fontSize: 7.5, // Slightly smaller to help fit one line
         color: '#555',
     },
     link: {
@@ -53,17 +53,17 @@ const styles = StyleSheet.create({
         color: '#555',
     },
     separator: {
-        marginHorizontal: 8,
+        marginHorizontal: 4, // Reduced from 8 to save space
         color: '#94a3b8',
-        fontSize: 10, // Slightly larger dot
+        fontSize: 10,
     },
     icon: {
-        width: 10,
-        height: 10,
-        marginRight: 4,
+        width: 9, // Reduced from 10
+        height: 9, // Reduced from 10
+        marginRight: 3, // Reduced from 4
         color: '#555',
         // Ensure icon is centered vertically with text
-        marginTop: -1,
+        marginTop: 0,
     },
     section: {
         marginBottom: 10,
