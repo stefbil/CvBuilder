@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { apiFetch } from '../utils/api'
+import { exportToPDF } from '../utils/pdfExport'
 import ContactForm from '../components/forms/ContactForm'
 import ExperienceForm from '../components/forms/ExperienceForm'
 import EducationForm from '../components/forms/EducationForm'
@@ -41,10 +43,7 @@ export default function Editor() {
 
     async function fetchResume() {
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`/api/resumes/${id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            })
+            const res = await apiFetch(`/api/resumes/${id}`)
             if (!res.ok) throw new Error('Resume not found')
             const data = await res.json()
             setResume(data)
@@ -60,13 +59,8 @@ export default function Editor() {
     const saveResume = useCallback(async (data) => {
         setSaveStatus('saving')
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`/api/resumes/${id}`, {
+            const res = await apiFetch(`/api/resumes/${id}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
                 body: JSON.stringify(data),
             })
             if (res.ok) {
@@ -154,25 +148,15 @@ export default function Editor() {
             setSaveStatus('saving')
             await saveResume(resumeRef.current)
 
-            const token = localStorage.getItem('token');
-            const res = await fetch(`/api/resumes/${id}/pdf`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            })
-            if (!res.ok) throw new Error('PDF generation failed')
-            const blob = await res.blob()
-            const url = URL.createObjectURL(blob)
-            const a = document.createElement('a')
-            a.href = url
             const name = resume.contact?.firstName && resume.contact?.lastName
                 ? `${resume.contact.firstName}_${resume.contact.lastName}_Resume.pdf`
                 : 'Resume.pdf'
-            a.download = name
-            a.click()
-            URL.revokeObjectURL(url)
+
+            await exportToPDF('.a4-page', name)
             setSaveStatus('saved')
         } catch (err) {
             console.error('PDF download failed:', err)
-            alert('Failed to generate PDF. Make sure the dev server is running.')
+            alert('Failed to generate PDF. Please try again.')
         }
     }
 

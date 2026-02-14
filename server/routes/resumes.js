@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { authenticateToken } from '../middleware/auth.js';
+import authMiddleware from '../middleware/auth.js';
 
 const router = Router();
 const prisma = new PrismaClient();
 
-// Apply auth middleware to all resume routes
-router.use(authenticateToken);
+// Apply auth to all resume routes
+router.use('/resumes', authMiddleware);
 
 // Helper: include all resume relations
 const fullInclude = {
@@ -19,10 +19,10 @@ const fullInclude = {
 };
 
 // List all resumes for the authenticated user
-router.get('/', async (req, res) => {
+router.get('/resumes', async (req, res) => {
     try {
         const resumes = await prisma.resume.findMany({
-            where: { userId: req.user.userId },
+            where: { userId: req.userId },
             orderBy: { updatedAt: 'desc' },
             include: { contact: true },
         });
@@ -33,54 +33,49 @@ router.get('/', async (req, res) => {
 });
 
 // Create a new resume
-router.post('/', async (req, res) => {
+router.post('/resumes', async (req, res) => {
     try {
-        console.log('POST /resumes body:', req.body);
         const { title } = req.body;
-        console.log('Creating resume with title:', title);
         const resume = await prisma.resume.create({
             data: {
-                userId: req.user.userId,
                 title: title || 'Untitled Resume',
+                userId: req.userId,
                 contact: { create: {} },
             },
             include: fullInclude,
         });
-        console.log('Resume created:', resume.id);
         res.json(resume);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// Get a full resume with all relations
-router.get('/:id', async (req, res) => {
+// Get a full resume with all relations (ownership check)
+router.get('/resumes/:id', async (req, res) => {
     try {
-        const resume = await prisma.resume.findFirst({
-            where: {
-                id: req.params.id,
-                userId: req.user.userId
-            },
+        const resume = await prisma.resume.findUnique({
+            where: { id: req.params.id },
             include: fullInclude,
         });
         if (!resume) return res.status(404).json({ error: 'Resume not found' });
+        if (resume.userId !== req.userId) return res.status(403).json({ error: 'Access denied' });
         res.json(resume);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// Auto-save: update a resume and all its relations
-router.put('/:id', async (req, res) => {
+// Auto-save: update a resume and all its relations (ownership check)
+router.put('/resumes/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, summary, templateId, sectionOrder, contact, experience, projects, education, skills, customSections } = req.body;
 
-        // Verify ownership
-        const existing = await prisma.resume.findFirst({
-            where: { id, userId: req.user.userId }
-        });
+        // Ownership check
+        const existing = await prisma.resume.findUnique({ where: { id } });
         if (!existing) return res.status(404).json({ error: 'Resume not found' });
+        if (existing.userId !== req.userId) return res.status(403).json({ error: 'Access denied' });
+
+        const { title, summary, templateId, sectionOrder, contact, experience, projects, education, skills, customSections } = req.body;
 
         // Update main resume fields
         await prisma.resume.update({
@@ -212,8 +207,8 @@ router.put('/:id', async (req, res) => {
         }
 
         // Return the updated resume
-        const updated = await prisma.resume.findFirst({
-            where: { id, userId: req.user.userId },
+        const updated = await prisma.resume.findUnique({
+            where: { id },
             include: fullInclude,
         });
 
@@ -224,62 +219,17 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// Delete a resume
-router.delete('/:id', async (req, res) => {
+// Delete a resume (ownership check)
+router.delete('/resumes/:id', async (req, res) => {
     try {
-        const { id } = req.params;
-        const result = await prisma.resume.deleteMany({
-            where: { id, userId: req.user.userId }
-        });
+        const existing = await prisma.resume.findUnique({ where: { id: req.params.id } });
+        if (!existing) return res.status(404).json({ error: 'Resume not found' });
+        if (existing.userId !== req.userId) return res.status(403).json({ error: 'Access denied' });
 
-        if (result.count === 0) {
-            return res.status(404).json({ error: 'Resume not found' });
-        }
-
+        await prisma.resume.delete({ where: { id: req.params.id } });
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: err.message });
-    }
-});
-
-// Generate PDF
-router.get('/resumes/:id/pdf', async (req, res) => {
-    try {
-        const puppeteer = await import('puppeteer');
-        const browser = await puppeteer.default.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        });
-
-        const page = await browser.newPage();
-        await page.goto(`http://localhost:5173/print/${req.params.id}`, {
-            waitUntil: 'networkidle0',
-            timeout: 15000,
-        });
-
-        // Wait for the resume to render
-        await page.waitForSelector('.a4-page', { timeout: 10000 });
-
-        // Small delay for fonts to load
-        await new Promise(r => setTimeout(r, 500));
-
-        const pdf = await page.pdf({
-            format: 'A4',
-            printBackground: true,
-            margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' },
-        });
-
-        await browser.close();
-
-        res.set({
-            'Content-Type': 'application/pdf',
-            'Content-Disposition': `attachment; filename="resume.pdf"`,
-            'Content-Length': pdf.length,
-        });
-        res.send(pdf);
-    } catch (err) {
-        console.error('PDF generation error:', err);
-        res.status(500).json({ error: 'Failed to generate PDF: ' + err.message });
     }
 });
 

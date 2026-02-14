@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { apiFetch } from '../utils/api'
 import CreateResumeModal from '../components/CreateResumeModal'
 
 export default function Dashboard() {
@@ -7,6 +9,7 @@ export default function Dashboard() {
     const [showModal, setShowModal] = useState(false)
     const [loading, setLoading] = useState(true)
     const navigate = useNavigate()
+    const { user, logout } = useAuth()
 
     useEffect(() => {
         fetchResumes()
@@ -14,13 +17,7 @@ export default function Dashboard() {
 
     async function fetchResumes() {
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch('/api/resumes', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.status === 401) {
-                // handle unauthorized/token expiration if needed, though PrivateRoute handles initial check
-            }
+            const res = await apiFetch('/api/resumes')
             const data = await res.json()
             setResumes(data)
         } catch (err) {
@@ -34,15 +31,16 @@ export default function Dashboard() {
         e.stopPropagation()
         if (!confirm('Are you sure you want to delete this resume?')) return
         try {
-            const token = localStorage.getItem('token');
-            await fetch(`/api/resumes/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            })
+            await apiFetch(`/api/resumes/${id}`, { method: 'DELETE' })
             setResumes(prev => prev.filter(r => r.id !== id))
         } catch (err) {
             console.error('Failed to delete:', err)
         }
+    }
+
+    function handleLogout() {
+        logout()
+        navigate('/login')
     }
 
     function formatDate(dateStr) {
@@ -66,16 +64,24 @@ export default function Dashboard() {
                 <div>
                     <h1 className="dashboard-title">My Resumes</h1>
                     <p className="dashboard-subtitle">
-                        {resumes.length} resume{resumes.length !== 1 ? 's' : ''} created
+                        {user?.name ? `${user.name} · ` : ''}{resumes.length} resume{resumes.length !== 1 ? 's' : ''} created
                     </p>
                 </div>
-                <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="8" y1="3" x2="8" y2="13" />
-                        <line x1="3" y1="8" x2="13" y2="8" />
-                    </svg>
-                    New Resume
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                            <line x1="8" y1="3" x2="8" y2="13" />
+                            <line x1="3" y1="8" x2="13" y2="8" />
+                        </svg>
+                        New Resume
+                    </button>
+                    <button className="btn btn-secondary" onClick={handleLogout} title="Sign out">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                            <path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M11 11l3-3-3-3M6 8h8" />
+                        </svg>
+                        Sign out
+                    </button>
+                </div>
             </div>
 
             {loading ? (

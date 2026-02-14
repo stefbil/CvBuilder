@@ -1,57 +1,55 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import resumesRouter from './routes/resumes.js';
 import authRouter from './routes/auth.js';
+import resumesRouter from './routes/resumes.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
-app.use(cors());
+// CORS — restrict in production
+const corsOptions = {
+    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' }));
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const distPath = join(__dirname, '../dist');
-
-console.log('Static file path:', distPath);
-import fs from 'fs';
-if (fs.existsSync(distPath)) {
-    console.log('Dist directory contents:', fs.readdirSync(distPath));
-} else {
-    console.error('Dist directory does not exist!');
-}
-
-// Serve static files from the dist directory
-app.use(express.static(distPath));
+// Rate limiting on auth routes
+import rateLimit from 'express-rate-limit';
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 20, // 20 attempts per window
+    message: { error: 'Too many attempts, please try again later' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+app.use('/api/auth', authLimiter);
 
 // API Routes
-app.use('/api/auth', authRouter);
-app.use('/api/resumes', resumesRouter);
+app.use('/api', authRouter);
+app.use('/api', resumesRouter);
 
-// Basic health check
+// Health check
 app.get('/health', (req, res) => {
     res.json({ status: 'ok' });
 });
 
-// Catch-all route to serve index.html for client-side routing
-app.get(/.*/, (req, res) => {
-    const indexPath = join(__dirname, '../dist/index.html');
-    if (!fs.existsSync(indexPath)) {
-        console.error('Index file not found at:', indexPath);
-        return res.status(404).send('Index file not found (server misconfiguration)');
-    }
-    res.sendFile(indexPath, (err) => {
-        if (err) {
-            console.error('Error sending index.html:', err);
-            res.status(500).send('Error serving app');
-        }
+// In production, serve the built frontend
+if (process.env.NODE_ENV === 'production') {
+    const distPath = join(__dirname, '..', 'dist');
+    app.use(express.static(distPath));
+    app.get('*', (req, res) => {
+        res.sendFile(join(distPath, 'index.html'));
     });
-});
+}
 
 // Start server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
-    console.log(`Serving static files from: ${distPath}`);
 });
