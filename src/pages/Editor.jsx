@@ -164,6 +164,8 @@ export default function Editor() {
         // setIsReorderMode(false) 
     }
 
+    console.log('Editor rendering, resume:', resume)
+
     if (loading) {
         return (
             <div className="editor-layout">
@@ -172,7 +174,10 @@ export default function Editor() {
         )
     }
 
-    if (!resume) return null
+    if (!resume) {
+        console.log('Resume is null')
+        return null
+    }
 
     // Build tabs: Contact is always first, then the ordered sections
     const tabs = [
