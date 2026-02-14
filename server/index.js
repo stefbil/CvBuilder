@@ -12,6 +12,9 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust Railway's proxy (for rate limiting and secure cookies)
+app.set('trust proxy', 1);
+
 // CORS — restrict in production
 const corsOptions = {
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
