@@ -1,0 +1,23 @@
+/* ─── Page Break Preview ─── */
+.page-break-marker {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 2px dashed rgba(239, 68, 68, 0.5);
+    /* Semi-transparent red */
+    z-index: 50;
+    pointer-events: none;
+    font-family: 'Inter', sans-serif;
+}
+
+.page-break-label {
+    position: absolute;
+    right: 10px;
+    top: 0;
+    background: rgba(239, 68, 68, 0.8);
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 0 0 4px 4px;
+    font-weight: 500;
+}

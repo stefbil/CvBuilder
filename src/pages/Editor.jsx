@@ -34,6 +34,7 @@ export default function Editor() {
     const [saveStatus, setSaveStatus] = useState('saved')
     const [loading, setLoading] = useState(true)
     const [showReorder, setShowReorder] = useState(false)
+    const [showPageBreaks, setShowPageBreaks] = useState(false)
     const saveTimerRef = useRef(null)
     const resumeRef = useRef(null)
 
@@ -218,6 +219,17 @@ export default function Editor() {
                         </span>
                         <button
                             className="btn-icon"
+                            onClick={() => setShowPageBreaks(!showPageBreaks)}
+                            title="Toggle Page Breaks"
+                            style={showPageBreaks ? { borderColor: 'var(--accent)', color: 'var(--accent)' } : {}}
+                        >
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                <rect x="2.5" y="2.5" width="9" height="9" rx="1" />
+                                <path d="M2.5 7h9" strokeDasharray="2 2" />
+                            </svg>
+                        </button>
+                        <button
+                            className="btn-icon"
                             onClick={() => setShowReorder(!showReorder)}
                             title="Reorder sections"
                             style={showReorder ? { borderColor: 'var(--accent)', color: 'var(--accent)' } : {}}
@@ -323,7 +335,7 @@ export default function Editor() {
             {/* Right: Live Preview */}
             <div className="preview-pane">
                 <div className="preview-container">
-                    <ResumePreview resume={resume} />
+                    <ResumePreview resume={resume} showPageBreaks={showPageBreaks} />
                 </div>
             </div>
         </div>

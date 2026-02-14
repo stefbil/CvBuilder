@@ -1,4 +1,6 @@
 import '../styles/resume.css'
+import '../styles/page-break.css'
+import { useEffect, useState, useRef } from 'react'
 
 // Inline SVG icons for contact items (Rezi-style)
 const icons = {
@@ -40,7 +42,9 @@ const DEFAULT_SECTION_ORDER = ['summary', 'skills', 'education', 'experience', '
 
 const BUILTIN_SECTIONS = ['summary', 'skills', 'education', 'experience', 'projects']
 
-export default function ResumePreview({ resume }) {
+export default function ResumePreview({ resume, showPageBreaks }) {
+    const containerRef = useRef(null)
+    const [breaks, setBreaks] = useState([])
     const contact = resume.contact || {}
     const experiences = resume.experience || []
     const projects = resume.projects || []
@@ -245,8 +249,51 @@ export default function ResumePreview({ resume }) {
         )
     }
 
+    useEffect(() => {
+        if (!containerRef.current || !showPageBreaks) {
+            setBreaks([])
+            return
+        }
+
+        const updateBreaks = () => {
+            const element = containerRef.current
+            const totalHeight = element.scrollHeight
+            const width = element.offsetWidth
+            // A4 Aspect Ratio: 297/210
+            // We use the rendered width to calculate the pixel height of one A4 page
+            const pageHeight = width * (297 / 210)
+
+            const newBreaks = []
+            let currentHeight = pageHeight
+            let pageNum = 1
+
+            // If total height is within one page, no breaks needed (unless we want to show the bottom of page 1)
+            // But usually we want to see where the text cuts.
+            // Let's show breaks as long as they are within the scrollHeight
+            while (currentHeight < totalHeight) {
+                newBreaks.push({ top: currentHeight, label: `End of Page ${pageNum}` })
+                currentHeight += pageHeight
+                pageNum++
+            }
+            setBreaks(newBreaks)
+        }
+
+        updateBreaks()
+
+        // ResizeObserver to handle window resizing or content changes
+        const observer = new ResizeObserver(updateBreaks)
+        observer.observe(containerRef.current)
+
+        return () => observer.disconnect()
+    }, [resume, showPageBreaks])
+
     return (
-        <div className="a4-page">
+        <div className="a4-page" ref={containerRef}>
+            {breaks.map((brk, i) => (
+                <div key={i} className="page-break-marker" style={{ top: `${brk.top}px` }}>
+                    <span className="page-break-label">{brk.label}</span>
+                </div>
+            ))}
             {!hasContent ? (
                 <div style={{ textAlign: 'center', paddingTop: '120px' }}>
                     <p className="resume-empty-hint">Start filling in your details to see the preview</p>

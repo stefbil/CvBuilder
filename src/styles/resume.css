@@ -49,8 +49,7 @@
 .resume-contact-item {
     display: inline-flex;
     align-items: center;
-    margin-right: 12px;
-    /* Replaces gap */
+    /* Removed margin-right to rely on separator spacing */
     vertical-align: middle;
 }
 
@@ -80,6 +79,7 @@
     color: #cbd5e1;
     font-size: 8pt;
     margin: 0 8px;
+    /* Symmetric margin */
     font-weight: 400;
 }
 
@@ -107,7 +107,8 @@
     letter-spacing: 0.08em;
     color: #1a5276;
     border-bottom: 2px solid #1a5276;
-    padding-bottom: 4px;
+    padding-bottom: 6px;
+    /* Increased from 4px to 6px */
     margin-bottom: 4mm;
 }
 
