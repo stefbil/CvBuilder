@@ -41,9 +41,9 @@ export default function Editor() {
 
     async function fetchResume() {
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('token');
             const res = await fetch(`/api/resumes/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { 'Authorization': `Bearer ${token}` }
             })
             if (!res.ok) throw new Error('Resume not found')
             const data = await res.json()
@@ -60,12 +60,12 @@ export default function Editor() {
     const saveResume = useCallback(async (data) => {
         setSaveStatus('saving')
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('token');
             const res = await fetch(`/api/resumes/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(data),
             })
@@ -154,9 +154,9 @@ export default function Editor() {
             setSaveStatus('saving')
             await saveResume(resumeRef.current)
 
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('token');
             const res = await fetch(`/api/resumes/${id}/pdf`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { 'Authorization': `Bearer ${token}` }
             })
             if (!res.ok) throw new Error('PDF generation failed')
             const blob = await res.blob()

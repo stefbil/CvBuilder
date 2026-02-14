@@ -8,9 +8,13 @@ export default function CreateResumeModal({ onClose, onCreated }) {
         e.preventDefault()
         setCreating(true)
         try {
+            const token = localStorage.getItem('token');
             const res = await fetch('/api/resumes', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ title: title || 'Untitled Resume' }),
             })
             const data = await res.json()

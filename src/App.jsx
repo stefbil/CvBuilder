@@ -1,40 +1,39 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider, useAuth } from './context/AuthContext'
 import Dashboard from './pages/Dashboard'
 import Editor from './pages/Editor'
 import PrintView from './pages/PrintView'
 import Login from './pages/Login'
-import Signup from './pages/Signup'
+import Register from './pages/Register'
+import { AuthProvider, useAuth } from './context/AuthContext'
 import './index.css'
 
-function ProtectedRoute({ children }) {
+const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return <div>Loading...</div>;
-  if (!user) return <Navigate to="/login" />;
-  return children;
-}
+  return user ? children : <Navigate to="/login" />;
+};
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/" element={
-            <ProtectedRoute>
+            <PrivateRoute>
               <Dashboard />
-            </ProtectedRoute>
+            </PrivateRoute>
           } />
           <Route path="/editor/:id" element={
-            <ProtectedRoute>
+            <PrivateRoute>
               <Editor />
-            </ProtectedRoute>
+            </PrivateRoute>
           } />
           <Route path="/print/:id" element={<PrintView />} />
         </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </BrowserRouter>
   )
 }
 

@@ -5,6 +5,9 @@ import { authenticateToken } from '../middleware/auth.js';
 const router = Router();
 const prisma = new PrismaClient();
 
+// Apply auth middleware to all resume routes
+router.use(authenticateToken);
+
 // Helper: include all resume relations
 const fullInclude = {
     contact: true,
@@ -16,10 +19,10 @@ const fullInclude = {
 };
 
 // List all resumes for the authenticated user
-router.get('/resumes', authenticateToken, async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const resumes = await prisma.resume.findMany({
-            where: { userId: req.user.id },
+            where: { userId: req.user.userId },
             orderBy: { updatedAt: 'desc' },
             include: { contact: true },
         });
@@ -30,28 +33,34 @@ router.get('/resumes', authenticateToken, async (req, res) => {
 });
 
 // Create a new resume
-router.post('/resumes', authenticateToken, async (req, res) => {
+router.post('/', async (req, res) => {
     try {
+        console.log('POST /resumes body:', req.body);
         const { title } = req.body;
+        console.log('Creating resume with title:', title);
         const resume = await prisma.resume.create({
             data: {
+                userId: req.user.userId,
                 title: title || 'Untitled Resume',
-                userId: req.user.id,
                 contact: { create: {} },
             },
             include: fullInclude,
         });
+        console.log('Resume created:', resume.id);
         res.json(resume);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// Get a full resume (ensure ownership)
-router.get('/resumes/:id', authenticateToken, async (req, res) => {
+// Get a full resume with all relations
+router.get('/:id', async (req, res) => {
     try {
         const resume = await prisma.resume.findFirst({
-            where: { id: req.params.id, userId: req.user.id },
+            where: {
+                id: req.params.id,
+                userId: req.user.userId
+            },
             include: fullInclude,
         });
         if (!resume) return res.status(404).json({ error: 'Resume not found' });
@@ -61,18 +70,17 @@ router.get('/resumes/:id', authenticateToken, async (req, res) => {
     }
 });
 
-// Update a resume (ensure ownership)
-router.put('/resumes/:id', authenticateToken, async (req, res) => {
+// Auto-save: update a resume and all its relations
+router.put('/:id', async (req, res) => {
     try {
         const { id } = req.params;
+        const { title, summary, templateId, sectionOrder, contact, experience, projects, education, skills, customSections } = req.body;
 
-        // Ownership check
+        // Verify ownership
         const existing = await prisma.resume.findFirst({
-            where: { id, userId: req.user.id }
+            where: { id, userId: req.user.userId }
         });
         if (!existing) return res.status(404).json({ error: 'Resume not found' });
-
-        const { title, summary, templateId, sectionOrder, contact, experience, projects, education, skills, customSections } = req.body;
 
         // Update main resume fields
         await prisma.resume.update({
@@ -205,7 +213,7 @@ router.put('/resumes/:id', authenticateToken, async (req, res) => {
 
         // Return the updated resume
         const updated = await prisma.resume.findFirst({
-            where: { id, userId: req.user.id },
+            where: { id, userId: req.user.userId },
             include: fullInclude,
         });
 
@@ -216,16 +224,16 @@ router.put('/resumes/:id', authenticateToken, async (req, res) => {
     }
 });
 
-// Delete a resume (ensure ownership)
-router.delete('/resumes/:id', authenticateToken, async (req, res) => {
+// Delete a resume
+router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const result = await prisma.resume.deleteMany({
-            where: { id, userId: req.user.id }
+            where: { id, userId: req.user.userId }
         });
 
         if (result.count === 0) {
-            return res.status(404).json({ error: 'Resume not found or not authorized' });
+            return res.status(404).json({ error: 'Resume not found' });
         }
 
         res.json({ success: true });
@@ -234,81 +242,26 @@ router.delete('/resumes/:id', authenticateToken, async (req, res) => {
     }
 });
 
-// Generate PDF (Public access - resumes should be generating based on ID, but ideally protected or using a signed URL. 
-// For now, keeping public access to simplify print view logic, or we can require token if print view sends it)
-// Let's keep PDF generation protected for now, but the print view page might need the token.
-// Actually, the print view is a frontend route. Puppeteer visits the frontend.
-// The frontend print view needs to fetch data. If we protect the GET route, Puppeteer needs a way to auth.
-// Simplest solution for this phase: Allow PDF generation route to be protected (user requests it), 
-// but the underlying data fetch for print view might need a special unauthed endpoint or token passing.
-// Given Puppeteer runs on server, we can bypass network and inject data, or use a "rendering token".
-// 
-// BETTER APPROACH FOR MVP:
-// 1. The /pdf endpoint is protected (so only owner can request PDF).
-// 2. Puppeteer sets an auth cookie or header when visiting the page.
-//    OR: We create a temporary /public/resumes/:id endpoint for the printer? No, security risk.
-// 
-// Let's stick to the simplest working model:
-// The /pdf endpoint is protected.
-// Puppeteer launches browser.
-// We can pass the Resume Data directly to the print template? No, it's a URL visit.
-// 
-// Alternative: Puppeteer visits a local file or we inject a script.
-// 
-// Decision: Let's modify the /pdf route to fetch the resume data securely on the server (we already have req.user),
-// and then inject that data into the page via Puppeteer's `evaluate`, eliminating the need for the page to fetch it.
-// This is robust.
-// 
-// I will implement this injection strategy in the replacement content.
-
-router.get('/resumes/:id/pdf', authenticateToken, async (req, res) => {
+// Generate PDF
+router.get('/resumes/:id/pdf', async (req, res) => {
     try {
-        // Fetch resume data securely first
-        const resume = await prisma.resume.findFirst({
-            where: { id: req.params.id, userId: req.user.id },
-            include: fullInclude
-        });
-
-        if (!resume) return res.status(404).json({ error: 'Resume not found' });
-
         const puppeteer = await import('puppeteer');
         const browser = await puppeteer.default.launch({
             headless: true,
-            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--disable-gpu',
-                '--single-process',
-            ],
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
         });
-
-        const port = process.env.PORT || 5173;
-        const baseUrl = process.env.NODE_ENV === 'production'
-            ? `http://localhost:${port}`
-            : 'http://localhost:5173';
 
         const page = await browser.newPage();
-
-        // Navigate to the print page
-        await page.goto(`${baseUrl}/print/${req.params.id}?print=true`, {
+        await page.goto(`http://localhost:5173/print/${req.params.id}`, {
             waitUntil: 'networkidle0',
-            timeout: 30000,
+            timeout: 15000,
         });
 
-        // INJECT DATA: The frontend needs to support receiving data via window object to avoid fetch if present.
-        // We will modify the frontend PrintView to check window.__RESUME_DATA__
-        await page.evaluate((data) => {
-            window.__RESUME_DATA__ = data;
-            // Trigger a re-render or event if needed, but if we do this before hydration it might be tricky.
-            // Actually, best to go to a special "render" route or just rely on the standard fetch if we can pass the token.
-            // Passing token via URL param `?token=...` is easiest for Puppeteer.
-        }, resume);
-
-        // Wait for potential re-render
-        await new Promise(r => setTimeout(r, 500));
+        // Wait for the resume to render
         await page.waitForSelector('.a4-page', { timeout: 10000 });
+
+        // Small delay for fonts to load
+        await new Promise(r => setTimeout(r, 500));
 
         const pdf = await page.pdf({
             format: 'A4',
