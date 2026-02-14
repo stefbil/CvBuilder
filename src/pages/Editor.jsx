@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { saveResume, getResume } from '../utils/api'
 import ResumePDF from '../components/ResumePDF'
 import { PDFDownloadLink } from '@react-pdf/renderer'
-import { User, Briefcase, GraduationCap, FolderGit2, Wrench, FileText, Layers, ArrowLeft, Download, Eye, EyeOff, List, ChevronUp, ChevronDown, Trash2, Plus } from 'lucide-react'
+import { User, Briefcase, GraduationCap, FolderGit2, Wrench, FileText, Layers, ArrowLeft, Download, Eye, EyeOff, List, ChevronUp, ChevronDown, Trash2, Plus, ArrowRight } from 'lucide-react'
 import ContactForm from '../components/forms/ContactForm'
 import ExperienceForm from '../components/forms/ExperienceForm'
 import EducationForm from '../components/forms/EducationForm'
@@ -48,10 +48,21 @@ export default function Editor() {
     const [showPageBreaks, setShowPageBreaks] = useState(false)
     const saveTimerRef = useRef(null)
     const resumeRef = useRef(null)
+    const tabsRef = useRef(null)
 
     useEffect(() => {
         fetchResume()
     }, [id])
+
+    // Auto-scroll active tab into view
+    useEffect(() => {
+        if (tabsRef.current) {
+            const activeElement = tabsRef.current.querySelector('.editor-tab.active')
+            if (activeElement) {
+                activeElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+            }
+        }
+    }, [activeTab])
 
     async function fetchResume() {
         try {
@@ -172,6 +183,20 @@ export default function Editor() {
 
     const isCustomSection = (key) => !BUILTIN_LABELS[key]
 
+    const handleNext = () => {
+        const currentIndex = tabs.findIndex(t => t.id === activeTab)
+        if (currentIndex < tabs.length - 1) {
+            setActiveTab(tabs[currentIndex + 1].id)
+        }
+    }
+
+    const handlePrevious = () => {
+        const currentIndex = tabs.findIndex(t => t.id === activeTab)
+        if (currentIndex > 0) {
+            setActiveTab(tabs[currentIndex - 1].id)
+        }
+    }
+
     const renderForm = () => {
         const props = { resume, updateResume }
         switch (activeTab) {
@@ -186,6 +211,10 @@ export default function Editor() {
                 return <CustomSectionForm {...props} sectionId={activeTab} />
         }
     }
+
+    const currentTabIndex = tabs.findIndex(t => t.id === activeTab)
+    const isFirstTab = currentTabIndex === 0
+    const isLastTab = currentTabIndex === tabs.length - 1
 
     return (
         <div className="editor-layout">
@@ -252,7 +281,6 @@ export default function Editor() {
                             <div key={key} className="section-reorder-item">
                                 <span className="section-reorder-label">
                                     <div className="text-muted-foreground">
-                                        {/* Simple dot grid icon replacement */}
                                         <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" style={{ opacity: 0.5 }}>
                                             <circle cx="4" cy="3" r="1" /><circle cx="8" cy="3" r="1" />
                                             <circle cx="4" cy="6" r="1" /><circle cx="8" cy="6" r="1" />
@@ -306,7 +334,7 @@ export default function Editor() {
                     </div>
                 )}
 
-                <div className="editor-tabs">
+                <div className="editor-tabs" ref={tabsRef}>
                     {tabs.map(tab => (
                         <button
                             key={tab.id}
@@ -322,6 +350,25 @@ export default function Editor() {
 
                 <div className="form-panel">
                     {renderForm()}
+                </div>
+
+                <div className="p-4 border-t border-border flex justify-between bg-card">
+                    <button
+                        className="btn btn-secondary flex items-center gap-2"
+                        onClick={handlePrevious}
+                        disabled={isFirstTab}
+                        style={{ visibility: isFirstTab ? 'hidden' : 'visible' }}
+                    >
+                        <ArrowLeft size={16} /> Previous
+                    </button>
+                    <button
+                        className="btn btn-primary flex items-center gap-2"
+                        onClick={handleNext}
+                        disabled={isLastTab}
+                        style={{ visibility: isLastTab ? 'hidden' : 'visible' }}
+                    >
+                        Next <ArrowRight size={16} />
+                    </button>
                 </div>
             </div>
 
