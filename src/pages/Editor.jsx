@@ -46,6 +46,7 @@ export default function Editor() {
     const [loading, setLoading] = useState(true)
     const [isReorderMode, setIsReorderMode] = useState(false)
     const [showPageBreaks, setShowPageBreaks] = useState(false)
+    const [draggedIndex, setDraggedIndex] = useState(null)
     const saveTimerRef = useRef(null)
     const resumeRef = useRef(null)
     const navRef = useRef(null)
@@ -200,8 +201,6 @@ export default function Editor() {
             setActiveTab(tabs[currentIndex - 1].id)
         }
     }
-
-    const [draggedIndex, setDraggedIndex] = useState(null)
 
     const handleDragStart = (e, index) => {
         setDraggedIndex(index)
