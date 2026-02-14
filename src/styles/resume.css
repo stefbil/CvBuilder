@@ -49,8 +49,13 @@
 .resume-contact-item {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    margin-right: 12px;
+    /* Replaces gap */
     vertical-align: middle;
+}
+
+.resume-contact-item:last-child {
+    margin-right: 0;
 }
 
 .resume-contact-icon {
@@ -59,9 +64,12 @@
     justify-content: center;
     color: #1a5276;
     flex-shrink: 0;
+    margin-right: 6px;
+    /* Space between icon and text */
     margin-top: -1px;
-    /* Slight visual adjustment */
 }
+
+/* Slight visual adjustment */
 
 .resume-contact-icon svg {
     width: 10px;
