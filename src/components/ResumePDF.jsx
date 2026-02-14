@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
         fontSize: 10,
         lineHeight: 1.5,
         color: '#333',
+        backgroundColor: '#ffffff', // Ensure white background
     },
     header: {
         marginBottom: 20,
@@ -207,7 +208,7 @@ export default function ResumePDF({ resume }) {
     if (contact.website) contactItems.push({ text: contact.website.replace(/^https?:\/\/(www\.)?/, ''), href: contact.website, type: 'link', icon: 'website' });
 
     const renderSummary = () => summary && (
-        <View style={styles.section} wrap={false}>
+        <View style={styles.section}>
             <Text style={styles.sectionTitle}>Summary</Text>
             <Text style={{ fontSize: 9 }}>{summary}</Text>
         </View>
@@ -217,7 +218,7 @@ export default function ResumePDF({ resume }) {
         <View style={styles.section}>
             <Text style={styles.sectionTitle}>Experience</Text>
             {experiences.filter(e => e.role || e.company).map((exp, i) => (
-                <View key={i} style={styles.entry} wrap={false}>
+                <View key={i} style={styles.entry}>
                     <View style={styles.entryHeader}>
                         <Text style={styles.entryTitle}>{exp.role}</Text>
                         <Text style={styles.entryDate}>{exp.startDate}{exp.startDate && exp.endDate && ' — '}{exp.endDate}</Text>
@@ -241,7 +242,7 @@ export default function ResumePDF({ resume }) {
         <View style={styles.section}>
             <Text style={styles.sectionTitle}>Projects</Text>
             {projects.filter(p => p.name).map((proj, i) => (
-                <View key={i} style={styles.entry} wrap={false}>
+                <View key={i} style={styles.entry}>
                     <View style={styles.entryHeader}>
                         <Text style={styles.entryTitle}>{proj.name}</Text>
                         <Text style={styles.entryDate}>{proj.technologies}</Text>
@@ -262,7 +263,7 @@ export default function ResumePDF({ resume }) {
         <View style={styles.section}>
             <Text style={styles.sectionTitle}>Education</Text>
             {education.filter(e => e.degree || e.school).map((edu, i) => (
-                <View key={i} style={styles.entry} wrap={false}>
+                <View key={i} style={styles.entry}>
                     <View style={styles.entryHeader}>
                         <Text style={styles.entryTitle}>{edu.degree}</Text>
                         <Text style={styles.entryDate}>{edu.startDate}{edu.startDate && edu.endDate && ' — '}{edu.endDate}</Text>
@@ -284,7 +285,7 @@ export default function ResumePDF({ resume }) {
     );
 
     const renderSkills = () => skills.length > 0 && skills.some(s => s.category || s.items) && (
-        <View style={styles.section} wrap={false}>
+        <View style={styles.section}>
             <Text style={styles.sectionTitle}>Skills</Text>
             <View style={styles.skillsList}>
                 {skills.filter(s => s.category || s.items).map((skill, i) => (
@@ -309,7 +310,7 @@ export default function ResumePDF({ resume }) {
             <View key={id} style={styles.section}>
                 <Text style={styles.sectionTitle}>{cs.title}</Text>
                 {validItems.map((item, i) => (
-                    <View key={i} style={styles.entry} wrap={false}>
+                    <View key={i} style={styles.entry}>
                         {(item.title || item.date) && (
                             <View style={styles.entryHeader}>
                                 <Text style={styles.entryTitle}>{item.title}</Text>
