@@ -26,3 +26,18 @@ export async function apiFetch(url, options = {}) {
 
     return response;
 }
+
+export async function getResume(id) {
+    const res = await apiFetch(`/api/resumes/${id}`);
+    if (!res.ok) throw new Error('Resume not found');
+    return res.json();
+}
+
+export async function saveResume(id, data) {
+    const res = await apiFetch(`/api/resumes/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to save resume');
+    return res.json();
+}
