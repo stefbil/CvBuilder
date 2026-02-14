@@ -48,7 +48,7 @@ export default function Editor() {
     const [showPageBreaks, setShowPageBreaks] = useState(false)
     const saveTimerRef = useRef(null)
     const resumeRef = useRef(null)
-    const tabsRef = useRef(null)
+    const navRef = useRef(null)
 
     useEffect(() => {
         fetchResume()
@@ -56,10 +56,10 @@ export default function Editor() {
 
     // Auto-scroll active tab into view
     useEffect(() => {
-        if (tabsRef.current) {
-            const activeElement = tabsRef.current.querySelector('.editor-tab.active')
+        if (navRef.current) {
+            const activeElement = navRef.current.querySelector('.nav-item.active')
             if (activeElement) {
-                activeElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+                activeElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
             }
         }
     }, [activeTab])
@@ -133,7 +133,6 @@ export default function Editor() {
     }
 
     function removeSection(key) {
-        // Only custom sections can be removed
         const newOrder = sectionOrder.filter(k => k !== key)
         const newCustom = customSections.filter(cs => cs.id !== key)
         updateResume({
@@ -158,8 +157,6 @@ export default function Editor() {
         })
         setActiveTab(newId)
     }
-
-    // function handleDownloadPDF() { ... } // Replaced by PDFDownloadLink
 
     if (loading) {
         return (
@@ -207,7 +204,6 @@ export default function Editor() {
             case 'skills': return <SkillsForm {...props} />
             case 'summary': return <SummaryForm {...props} />
             default:
-                // Custom section
                 return <CustomSectionForm {...props} sectionId={activeTab} />
         }
     }
@@ -218,8 +214,8 @@ export default function Editor() {
 
     return (
         <div className="editor-layout">
-            {/* Left: Form Panel */}
-            <div className="editor-sidebar">
+            {/* Left Column: Navigation & Form */}
+            <div className="editor-main-panel">
                 <div className="editor-toolbar">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <button
@@ -270,105 +266,78 @@ export default function Editor() {
                     </div>
                 </div>
 
-                {/* Section Reorder Panel */}
-                {showReorder && (
-                    <div className="section-reorder-panel">
-                        <div className="section-reorder-header">
-                            <span>Section Order</span>
-                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Reorder or remove sections</span>
+                {/* Content Area: Sidebar + Form */}
+                <div className="editor-content-wrapper">
+                    {/* Vertical Sidebar */}
+                    <div className="vertical-nav" ref={navRef}>
+                        <div className="nav-header">Sections</div>
+                        <div className="nav-items">
+                            {tabs.map(tab => (
+                                <button
+                                    key={tab.id}
+                                    className={`nav-item ${activeTab === tab.id ? 'active' : ''}`}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    title={tab.label}
+                                >
+                                    {tab.Icon && <tab.Icon size={18} />}
+                                    <span>{tab.label}</span>
+                                </button>
+                            ))}
                         </div>
-                        {sectionOrder.map((key, index) => (
-                            <div key={key} className="section-reorder-item">
-                                <span className="section-reorder-label">
-                                    <div className="text-muted-foreground">
-                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" style={{ opacity: 0.5 }}>
-                                            <circle cx="4" cy="3" r="1" /><circle cx="8" cy="3" r="1" />
-                                            <circle cx="4" cy="6" r="1" /><circle cx="8" cy="6" r="1" />
-                                            <circle cx="4" cy="9" r="1" /><circle cx="8" cy="9" r="1" />
-                                        </svg>
-                                    </div>
-                                    {getSectionLabel(key)}
-                                    {isCustomSection(key) && (
-                                        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>custom</span>
-                                    )}
-                                </span>
-                                <div className="section-reorder-actions">
-                                    <button
-                                        className="btn-icon"
-                                        style={{ width: '24px', height: '24px', border: 'none' }}
-                                        onClick={() => moveSectionUp(index)}
-                                        disabled={index === 0}
-                                        title="Move up"
-                                    >
-                                        <ChevronUp size={14} />
-                                    </button>
-                                    <button
-                                        className="btn-icon"
-                                        style={{ width: '24px', height: '24px', border: 'none' }}
-                                        onClick={() => moveSectionDown(index)}
-                                        disabled={index === sectionOrder.length - 1}
-                                        title="Move down"
-                                    >
-                                        <ChevronDown size={14} />
-                                    </button>
-                                    {isCustomSection(key) && (
-                                        <button
-                                            className="btn-icon"
-                                            style={{ width: '24px', height: '24px', border: 'none', color: 'var(--danger)' }}
-                                            onClick={() => removeSection(key)}
-                                            title="Delete section"
-                                        >
-                                            <Trash2 size={14} />
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                        <button
-                            className="add-item-btn"
-                            onClick={addCustomSection}
-                            style={{ marginTop: '8px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                        >
-                            <Plus size={16} /> Add Custom Section
-                        </button>
                     </div>
-                )}
 
-                <div className="editor-tabs" ref={tabsRef}>
-                    {tabs.map(tab => (
-                        <button
-                            key={tab.id}
-                            className={`editor-tab ${activeTab === tab.id ? 'active' : ''} `}
-                            onClick={() => setActiveTab(tab.id)}
-                            title={tab.label}
-                        >
-                            {tab.Icon && <tab.Icon size={16} />}
-                            <span>{tab.label}</span>
-                        </button>
-                    ))}
-                </div>
+                    {/* Form Container */}
+                    <div className="form-container">
+                        {showReorder && (
+                            <div className="section-reorder-panel mb-6">
+                                <div className="section-reorder-header">
+                                    <span>Section Order</span>
+                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Drag to reorder or use arrows</span>
+                                </div>
+                                {sectionOrder.map((key, index) => (
+                                    <div key={key} className="section-reorder-item">
+                                        <span className="section-reorder-label">
+                                            {getSectionLabel(key)}
+                                            {isCustomSection(key) && <span className="text-xs text-muted-foreground ml-2">(custom)</span>}
+                                        </span>
+                                        <div className="section-reorder-actions">
+                                            <button className="btn-icon" onClick={() => moveSectionUp(index)} disabled={index === 0}><ChevronUp size={14} /></button>
+                                            <button className="btn-icon" onClick={() => moveSectionDown(index)} disabled={index === sectionOrder.length - 1}><ChevronDown size={14} /></button>
+                                            {isCustomSection(key) && (
+                                                <button className="btn-icon text-red-500" onClick={() => removeSection(key)}><Trash2 size={14} /></button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                                <button className="add-item-btn mt-2 w-full flex justify-center gap-2" onClick={addCustomSection}>
+                                    <Plus size={16} /> Add Custom Section
+                                </button>
+                            </div>
+                        )}
 
-                <div className="form-panel">
-                    {renderForm()}
-                </div>
+                        <div className="form-content">
+                            {renderForm()}
+                        </div>
 
-                <div className="p-4 border-t border-border flex justify-between bg-card">
-                    <button
-                        className="btn btn-secondary flex items-center gap-2"
-                        onClick={handlePrevious}
-                        disabled={isFirstTab}
-                        style={{ visibility: isFirstTab ? 'hidden' : 'visible' }}
-                    >
-                        <ArrowLeft size={16} /> Previous
-                    </button>
-                    <button
-                        className="btn btn-primary flex items-center gap-2"
-                        onClick={handleNext}
-                        disabled={isLastTab}
-                        style={{ visibility: isLastTab ? 'hidden' : 'visible' }}
-                    >
-                        Next <ArrowRight size={16} />
-                    </button>
+                        <div className="form-navigation">
+                            <button
+                                className="btn btn-secondary flex items-center gap-2"
+                                onClick={handlePrevious}
+                                disabled={isFirstTab}
+                                style={{ visibility: isFirstTab ? 'hidden' : 'visible' }}
+                            >
+                                <ArrowLeft size={16} /> Previous
+                            </button>
+                            <button
+                                className="btn btn-primary flex items-center gap-2"
+                                onClick={handleNext}
+                                disabled={isLastTab}
+                                style={{ visibility: isLastTab ? 'hidden' : 'visible' }}
+                            >
+                                Next <ArrowRight size={16} />
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
