@@ -13,9 +13,18 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const distPath = join(__dirname, '../dist');
+
+console.log('Static file path:', distPath);
+import fs from 'fs';
+if (fs.existsSync(distPath)) {
+    console.log('Dist directory contents:', fs.readdirSync(distPath));
+} else {
+    console.error('Dist directory does not exist!');
+}
 
 // Serve static files from the dist directory
-app.use(express.static(join(__dirname, '../dist')));
+app.use(express.static(distPath));
 
 // API Routes
 app.use('/api/auth', authRouter);
