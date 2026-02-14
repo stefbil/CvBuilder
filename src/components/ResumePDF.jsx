@@ -42,28 +42,29 @@ const styles = StyleSheet.create({
     contactItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 2, // Space between wrapped lines
+        marginBottom: 2,
     },
     contactText: {
-        fontSize: 7.5, // Slightly smaller to help fit one line
-        color: '#555',
+        fontSize: 9,
+        color: '#444',
     },
     link: {
         textDecoration: 'none',
-        color: '#555',
+        color: '#444',
+        fontSize: 9,
     },
     separator: {
-        marginHorizontal: 4, // Reduced from 8 to save space
-        color: '#94a3b8',
-        fontSize: 10,
+        marginHorizontal: 5,
+        color: '#cbd5e1',
+        fontSize: 12,
+        marginTop: -2, // Slight visual tweak for bullet alignment
     },
     icon: {
-        width: 9, // Reduced from 10
-        height: 9, // Reduced from 10
-        marginRight: 3, // Reduced from 4
-        color: '#555',
-        // Ensure icon is centered vertically with text
-        marginTop: 0,
+        width: 10,
+        height: 10,
+        marginRight: 4,
+        color: '#64748b',
+        marginTop: -1, // Lift icon slightly to align with text baseline
     },
     section: {
         marginBottom: 10,
