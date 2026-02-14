@@ -4,11 +4,9 @@ import { Page, Text, View, Document, StyleSheet, Link, Svg, Path, Circle, Rect, 
 
 // Register a font if needed, otherwise use Helvetica
 Font.register({
-    family: 'Merriweather',
+    family: 'Helvetica',
     fonts: [
-        { src: 'https://fonts.gstatic.com/s/merriweather/v13/RFda8w1V0eDZheqfcyQ4EOgdm0LZdjqr5-oayXSOefg.ttf' },
-        { src: 'https://fonts.gstatic.com/s/merriweather/v13/ZvcMqxEwPfh2qDWBPxn6nmB7wJ9CoPCp9n30ZBThZ1I.ttf', fontWeight: 'bold' },
-        { src: 'https://fonts.gstatic.com/s/merriweather/v13/SoIaTv59UAoZHgY4-N0p3T8E0i7KZn-EPnyo3HZu7kw.ttf', fontStyle: 'italic' },
+        { src: 'https://fonts.gstatic.com/s/helveticaneue/v70/1Ptsg8zYS_SKggPNyC0IT4ttDfA.ttf' }, // Fallback or use standard
     ]
 });
 
@@ -16,7 +14,7 @@ Font.register({
 const styles = StyleSheet.create({
     page: {
         padding: 30, // ~10mm
-        fontFamily: 'Merriweather',
+        fontFamily: 'Helvetica',
         fontSize: 10,
         lineHeight: 1.5,
         color: '#333',
@@ -28,10 +26,10 @@ const styles = StyleSheet.create({
     },
     name: {
         fontSize: 24,
-        fontFamily: 'Merriweather',
-        fontWeight: 'bold',
-        color: '#1a5276', // Dark Navy
+        fontWeight: 'bold', // Helvetica-Bold
+        color: '#000000', // Black
         marginBottom: 5,
+        // textTransform: 'uppercase', // Removed to match reference
     },
     contactLine: {
         flexDirection: 'row',
@@ -44,22 +42,26 @@ const styles = StyleSheet.create({
     contactItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 2,
-        marginHorizontal: 6, // Added spacing between items
+        marginBottom: 2, // Space between wrapped lines
     },
     contactText: {
-        fontSize: 7, // Small enough for single line
+        fontSize: 7.5, // Slightly smaller to help fit one line
         color: '#555',
     },
     link: {
         textDecoration: 'none',
         color: '#555',
     },
+    separator: {
+        marginHorizontal: 4, // Reduced from 8 to save space
+        color: '#94a3b8',
+        fontSize: 10,
+    },
     icon: {
         width: 9, // Reduced from 10
         height: 9, // Reduced from 10
         marginRight: 3, // Reduced from 4
-        color: '#1a5276', // Match name color
+        color: '#555',
         // Ensure icon is centered vertically with text
         marginTop: 0,
     },
@@ -359,6 +361,9 @@ export default function ResumePDF({ resume }) {
                                         <Link src={`mailto:${item.text}`} style={styles.link}>{item.text}</Link>
                                     ) : (
                                         <Text style={styles.contactText}>{item.text}</Text>
+                                    )}
+                                    {i < contactItems.length - 1 && (
+                                        <Text style={styles.separator}>•</Text>
                                     )}
                                 </View>
                             ))}
