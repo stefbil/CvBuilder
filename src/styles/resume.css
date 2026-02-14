@@ -78,8 +78,8 @@
 .resume-contact-separator {
     color: #cbd5e1;
     font-size: 8pt;
-    margin: 0 8px;
-    /* Symmetric margin */
+    margin: 0 4px;
+    /* Tightened from 8px */
     font-weight: 400;
 }
 
@@ -107,8 +107,8 @@
     letter-spacing: 0.08em;
     color: #1a5276;
     border-bottom: 2px solid #1a5276;
-    padding-bottom: 6px;
-    /* Increased from 4px to 6px */
+    padding-bottom: 2px;
+    /* Reduced from 6px */
     margin-bottom: 4mm;
 }
 
@@ -116,6 +116,7 @@
 .resume-entry {
     margin-bottom: 3.5mm;
     break-inside: avoid;
+    page-break-inside: avoid;
     /* Hint for print, script will enforce */
 }
 
@@ -256,6 +257,8 @@
 
     .a4-page {
         box-shadow: none;
+        margin: 0;
+        width: 100%;
         min-height: auto;
     }
 }

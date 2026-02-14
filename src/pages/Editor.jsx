@@ -145,20 +145,9 @@ export default function Editor() {
     }
 
     async function handleDownloadPDF() {
-        try {
-            setSaveStatus('saving')
-            await saveResume(resumeRef.current)
-
-            const name = resume.contact?.firstName && resume.contact?.lastName
-                ? `${resume.contact.firstName}_${resume.contact.lastName}_Resume.pdf`
-                : 'Resume.pdf'
-
-            await exportToPDF('.a4-page', name)
-            setSaveStatus('saved')
-        } catch (err) {
-            console.error('PDF download failed:', err)
-            alert('Failed to generate PDF. Please try again.')
-        }
+        // Ensure latest changes are saved before printing (optional, but good practice)
+        await saveResume(resumeRef.current)
+        exportToPDF()
     }
 
     if (loading) {
