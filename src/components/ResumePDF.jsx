@@ -3,13 +3,12 @@ import React from 'react';
 import { Page, Text, View, Document, StyleSheet, Link, Svg, Path, Circle, Rect, Line, Font } from '@react-pdf/renderer';
 
 // Register a font if needed, otherwise use Helvetica
-// Register Merriweather font
 Font.register({
     family: 'Merriweather',
     fonts: [
-        { src: 'https://fonts.gstatic.com/s/merriweather/v30/u-440qyriQwlOrhSvowK_l5-fCZM.ttf' }, // Regular
-        { src: 'https://fonts.gstatic.com/s/merriweather/v30/u-4n0qyriQwlOrhSvowK_l52xwNZWMf6.ttf', fontWeight: 'bold' }, // Bold
-        { src: 'https://fonts.gstatic.com/s/merriweather/v30/u-4m0qyriQwlOrhSvowK_l5-eWZlXcf_.ttf', fontStyle: 'italic' }, // Italic
+        { src: 'https://fonts.gstatic.com/s/merriweather/v13/RFda8w1V0eDZheqfcyQ4EOgdm0LZdjqr5-oayXSOefg.ttf' },
+        { src: 'https://fonts.gstatic.com/s/merriweather/v13/ZvcMqxEwPfh2qDWBPxn6nmB7wJ9CoPCp9n30ZBThZ1I.ttf', fontWeight: 'bold' },
+        { src: 'https://fonts.gstatic.com/s/merriweather/v13/SoIaTv59UAoZHgY4-N0p3T8E0i7KZn-EPnyo3HZu7kw.ttf', fontStyle: 'italic' },
     ]
 });
 
@@ -40,15 +39,16 @@ const styles = StyleSheet.create({
         display: 'flex',
         alignItems: 'center',
         flexWrap: 'wrap',
+        // gap: 4, // Removed to rely on separator margins and avoid assymetry
     },
     contactItem: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 2,
-        marginHorizontal: 6,
+        marginHorizontal: 6, // Added spacing between items
     },
     contactText: {
-        fontSize: 7,
+        fontSize: 7, // Small enough for single line
         color: '#555',
     },
     link: {
@@ -56,10 +56,11 @@ const styles = StyleSheet.create({
         color: '#555',
     },
     icon: {
-        width: 9,
-        height: 9,
-        marginRight: 3,
-        color: '#1a5276',
+        width: 9, // Reduced from 10
+        height: 9, // Reduced from 10
+        marginRight: 3, // Reduced from 4
+        color: '#1a5276', // Match name color
+        // Ensure icon is centered vertically with text
         marginTop: 0,
     },
     section: {
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
     },
     entryDate: {
         fontSize: 9,
-        fontStyle: 'italic',
+        fontStyle: 'italic', // Helvetica-Oblique
         color: '#666',
     },
     entrySubtitle: {
