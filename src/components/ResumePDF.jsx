@@ -26,10 +26,10 @@ const styles = StyleSheet.create({
     },
     name: {
         fontSize: 24,
-        fontWeight: 'bold', // Helvetica-Bold
-        color: '#000000', // Black
+        fontFamily: 'Times-Roman',
+        fontWeight: 'bold',
+        color: '#1a5276', // Dark Navy
         marginBottom: 5,
-        // textTransform: 'uppercase', // Removed to match reference
     },
     contactLine: {
         flexDirection: 'row',
@@ -42,26 +42,22 @@ const styles = StyleSheet.create({
     contactItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 2, // Space between wrapped lines
+        marginBottom: 2,
+        marginHorizontal: 6, // Added spacing between items
     },
     contactText: {
-        fontSize: 7.5, // Slightly smaller to help fit one line
+        fontSize: 7, // Small enough for single line
         color: '#555',
     },
     link: {
         textDecoration: 'none',
         color: '#555',
     },
-    separator: {
-        marginHorizontal: 4, // Reduced from 8 to save space
-        color: '#94a3b8',
-        fontSize: 10,
-    },
     icon: {
         width: 9, // Reduced from 10
         height: 9, // Reduced from 10
         marginRight: 3, // Reduced from 4
-        color: '#555',
+        color: '#1a5276', // Match name color
         // Ensure icon is centered vertically with text
         marginTop: 0,
     },
@@ -361,9 +357,6 @@ export default function ResumePDF({ resume }) {
                                         <Link src={`mailto:${item.text}`} style={styles.link}>{item.text}</Link>
                                     ) : (
                                         <Text style={styles.contactText}>{item.text}</Text>
-                                    )}
-                                    {i < contactItems.length - 1 && (
-                                        <Text style={styles.separator}>•</Text>
                                     )}
                                 </View>
                             ))}
