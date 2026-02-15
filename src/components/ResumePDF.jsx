@@ -210,6 +210,29 @@ export default function ResumePDF({ resume }) {
     if (contact.linkedin) contactItems.push({ text: contact.linkedin.replace(/^https?:\/\/(www\.)?/, ''), href: contact.linkedin, type: 'link', icon: 'linkedin' });
     if (contact.website) contactItems.push({ text: contact.website.replace(/^https?:\/\/(www\.)?/, ''), href: contact.website, type: 'link', icon: 'website' });
 
+    const renderDetails = () => (
+        <View style={styles.header}>
+            <Text style={styles.name}>{fullName}</Text>
+            <View style={styles.contactLine}>
+                {contactItems.map((item, i) => (
+                    <View key={i} style={styles.contactItem}>
+                        {Icons[item.icon]}
+                        {item.type === 'link' ? (
+                            <Link src={item.href} style={styles.link}>{item.text}</Link>
+                        ) : item.type === 'email' ? (
+                            <Link src={`mailto:${item.text}`} style={styles.link}>{item.text}</Link>
+                        ) : (
+                            <Text style={styles.contactText}>{item.text}</Text>
+                        )}
+                        {i < contactItems.length - 1 && (
+                            <Text style={styles.separator}>•</Text>
+                        )}
+                    </View>
+                ))}
+            </View>
+        </View>
+    );
+
     const renderSummary = () => summary && (
         <View style={styles.section}>
             <Text style={styles.sectionTitle}>Summary</Text>
@@ -348,28 +371,7 @@ export default function ResumePDF({ resume }) {
     return (
         <Document title={`${fullName} Resume`} author={fullName}>
             <Page size="A4" style={styles.page}>
-                {fullName && (
-                    <View style={styles.header}>
-                        <Text style={styles.name}>{fullName}</Text>
-                        <View style={styles.contactLine}>
-                            {contactItems.map((item, i) => (
-                                <View key={i} style={styles.contactItem}>
-                                    {Icons[item.icon]}
-                                    {item.type === 'link' ? (
-                                        <Link src={item.href} style={styles.link}>{item.text}</Link>
-                                    ) : item.type === 'email' ? (
-                                        <Link src={`mailto:${item.text}`} style={styles.link}>{item.text}</Link>
-                                    ) : (
-                                        <Text style={styles.contactText}>{item.text}</Text>
-                                    )}
-                                    {i < contactItems.length - 1 && (
-                                        <Text style={styles.separator}>•</Text>
-                                    )}
-                                </View>
-                            ))}
-                        </View>
-                    </View>
-                )}
+                {fullName && renderDetails()}
 
                 {sectionOrder.map(key => {
                     if (BUILTIN_SECTIONS.includes(key)) return renderers[key] ? renderers[key]() : null;
