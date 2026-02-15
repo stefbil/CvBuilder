@@ -21,41 +21,40 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff', // Ensure white background
     },
     header: {
-        marginBottom: 20,
+        marginBottom: 15,
         alignItems: 'center',
     },
     name: {
-        fontSize: 24,
-        fontWeight: 'bold', // Helvetica-Bold
-        color: '#000000', // Black
-        marginBottom: 5,
-        // textTransform: 'uppercase', // Removed to match reference
+        fontSize: 32,
+        fontWeight: 'bold',
+        color: '#000000',
+        marginBottom: 4,
     },
     contactLine: {
         flexDirection: 'row',
         justifyContent: 'center',
-        display: 'flex',
         alignItems: 'center',
         flexWrap: 'wrap',
-        // gap: 4, // Removed to rely on separator margins and avoid assymetry
+        gap: 6,
     },
     contactItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 2, // Space between wrapped lines
+        gap: 4,
     },
     contactText: {
-        fontSize: 7.5, // Slightly smaller to help fit one line
+        fontSize: 9,
         color: '#555',
     },
     link: {
         textDecoration: 'none',
-        color: '#555',
+        fontSize: 9,
+        color: '#000',
     },
     separator: {
-        marginHorizontal: 4, // Reduced from 8 to save space
+        fontSize: 9,
+        marginHorizontal: 4,
         color: '#94a3b8',
-        fontSize: 10,
     },
     icon: {
         width: 9, // Reduced from 10
@@ -215,19 +214,21 @@ export default function ResumePDF({ resume }) {
             <Text style={styles.name}>{fullName}</Text>
             <View style={styles.contactLine}>
                 {contactItems.map((item, i) => (
-                    <View key={i} style={styles.contactItem}>
-                        {Icons[item.icon]}
-                        {item.type === 'link' ? (
-                            <Link src={item.href} style={styles.link}>{item.text}</Link>
-                        ) : item.type === 'email' ? (
-                            <Link src={`mailto:${item.text}`} style={styles.link}>{item.text}</Link>
-                        ) : (
-                            <Text style={styles.contactText}>{item.text}</Text>
-                        )}
+                    <React.Fragment key={i}>
+                        <View style={styles.contactItem}>
+                            {Icons[item.icon]}
+                            {item.type === 'link' ? (
+                                <Link src={item.href} style={styles.link}>{item.text}</Link>
+                            ) : item.type === 'email' ? (
+                                <Link src={`mailto:${item.text}`} style={styles.link}>{item.text}</Link>
+                            ) : (
+                                <Text style={styles.contactText}>{item.text}</Text>
+                            )}
+                        </View>
                         {i < contactItems.length - 1 && (
                             <Text style={styles.separator}>•</Text>
                         )}
-                    </View>
+                    </React.Fragment>
                 ))}
             </View>
         </View>
