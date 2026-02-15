@@ -78,7 +78,7 @@ export default function Editor() {
         }
     }
 
-    const saveResume = useCallback(async (data) => {
+    const persistResume = useCallback(async (data) => {
         setSaveStatus('saving')
         try {
             await saveResume(id, data)
@@ -93,9 +93,9 @@ export default function Editor() {
         setSaveStatus('unsaved')
         if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
         saveTimerRef.current = setTimeout(() => {
-            saveResume(newResume)
+            persistResume(newResume)
         }, 800)
-    }, [saveResume])
+    }, [persistResume])
 
     function updateResume(updates) {
         const updated = { ...resumeRef.current, ...updates }
