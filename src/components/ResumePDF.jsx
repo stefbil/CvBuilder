@@ -4,9 +4,9 @@ import { Page, Text, View, Document, StyleSheet, Link, Svg, Path, Circle, Rect, 
 
 // Register a font if needed, otherwise use Helvetica
 Font.register({
-    family: 'Helvetica',
+    family: 'Merriweather',
     fonts: [
-        { src: 'https://fonts.gstatic.com/s/helveticaneue/v70/1Ptsg8zYS_SKggPNyC0IT4ttDfA.ttf' }, // Fallback or use standard
+        { src: 'https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap' }, // Fallback or use standard
     ]
 });
 
@@ -14,7 +14,7 @@ Font.register({
 const styles = StyleSheet.create({
     page: {
         padding: 30, // ~10mm
-        fontFamily: 'Helvetica',
+        fontFamily: 'Merriweather',
         fontSize: 10,
         lineHeight: 1.5,
         color: '#333',
