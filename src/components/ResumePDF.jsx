@@ -25,10 +25,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     name: {
-        fontSize: 24,
+        fontSize: 18,
         fontWeight: 'bold', // Helvetica-Bold
         color: '#000000', // Black
-        marginBottom: 5,
+        marginBottom: 4,
         // textTransform: 'uppercase', // Removed to match reference
     },
     contactLine: {
@@ -42,16 +42,16 @@ const styles = StyleSheet.create({
     contactItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 2,
+        marginBottom: 1,
     },
     contactText: {
-        fontSize: 9,
+        fontSize: 8,
         color: '#444',
     },
     link: {
         textDecoration: 'none',
         color: '#444',
-        fontSize: 9,
+        fontSize: 8,
     },
     separator: {
         marginHorizontal: 5,
@@ -208,8 +208,8 @@ export default function ResumePDF({ resume }) {
     if (contact.city || contact.country) contactItems.push({ text: [contact.city, contact.country].filter(Boolean).join(', '), icon: 'location' });
     if (contact.email) contactItems.push({ text: contact.email, type: 'email', icon: 'email' });
     if (contact.phone) contactItems.push({ text: contact.phone, icon: 'phone' });
-    if (contact.linkedin) contactItems.push({ text: contact.linkedin.replace(/^https?:\/\/(www\.)?/, ''), href: contact.linkedin, type: 'link', icon: 'linkedin' });
-    if (contact.website) contactItems.push({ text: contact.website.replace(/^https?:\/\/(www\.)?/, ''), href: contact.website, type: 'link', icon: 'website' });
+    if (contact.linkedin) contactItems.push({ text: 'LinkedIn', href: contact.linkedin, type: 'link', icon: 'linkedin' });
+    if (contact.website) contactItems.push({ text: 'Portfolio', href: contact.website, type: 'link', icon: 'website' });
 
     const renderSummary = () => summary && (
         <View style={styles.section}>
