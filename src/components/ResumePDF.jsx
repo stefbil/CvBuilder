@@ -25,15 +25,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     name: {
-        fontSize: 28,
+        fontSize: 26,
         fontWeight: 'bold',
         color: '#000000',
-        marginBottom: 8,
+        marginBottom: 6,
         textAlign: 'center',
     },
     contactLine: {
         flexDirection: 'row',
-        flexWrap: 'nowrap',
+        flexWrap: 'wrap',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 0,
@@ -41,31 +41,28 @@ const styles = StyleSheet.create({
     contactItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginHorizontal: 3,
     },
     contactText: {
-        fontSize: 9,
-        color: '#555',
+        fontSize: 8.5,
+        color: '#333',
         marginLeft: 2,
     },
     link: {
         textDecoration: 'none',
-        fontSize: 9,
+        fontSize: 8.5,
         color: '#000',
         marginLeft: 2,
     },
     separator: {
-        fontSize: 9,
-        marginHorizontal: 6,
-        color: '#94a3b8',
+        fontSize: 8,
+        marginHorizontal: 4,
+        color: '#333',
     },
     icon: {
-        width: 9, // Reduced from 10
-        height: 9, // Reduced from 10
-        marginRight: 3, // Reduced from 4
-        color: '#555',
-        // Ensure icon is centered vertically with text
-        marginTop: 0,
+        width: 8, // Reduced from 10
+        height: 8, // Reduced from 10
+        marginRight: 8, // Reduced from 4
+        color: '#333',
     },
     section: {
         marginBottom: 10,
