@@ -86,6 +86,7 @@ export default function Editor() {
         } catch (err) {
             console.error('Save failed:', err)
             setSaveStatus('unsaved')
+            alert('Failed to save resume: ' + err.message)
         }
     }, [id])
 
