@@ -2,13 +2,11 @@
 import React from 'react';
 import { Page, Text, View, Document, StyleSheet, Link, Svg, Path, Circle, Rect, Line, Font } from '@react-pdf/renderer';
 
-// Register Merriweather font
+// Register a font if needed, otherwise use Helvetica
 Font.register({
-    family: 'Merriweather',
+    family: 'Helvetica',
     fonts: [
-        { src: 'https://fonts.gstatic.com/s/merriweather/v30/u-4n0qyriQwlOrhSvowK_l52_wfzU1I.ttf', fontWeight: 'normal' },
-        { src: 'https://fonts.gstatic.com/s/merriweather/v30/u-4l0qyriQwlOrhSvowK_l5-eR7lXffpTPw.ttf', fontWeight: 'bold' },
-        { src: 'https://fonts.gstatic.com/s/merriweather/v30/u-4m0qyriQwlOrhSvowK_l5-ycZlYf0.ttf', fontStyle: 'italic' },
+        { src: 'https://fonts.gstatic.com/s/helveticaneue/v70/1Ptsg8zYS_SKggPNyC0IT4ttDfA.ttf' }, // Fallback or use standard
     ]
 });
 
@@ -16,26 +14,27 @@ Font.register({
 const styles = StyleSheet.create({
     page: {
         padding: 30, // ~10mm
-        fontFamily: 'Merriweather',
+        fontFamily: 'Helvetica',
         fontSize: 10,
-        lineHeight: 1.6,
+        lineHeight: 1.5,
         color: '#333',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#ffffff', // Ensure white background
     },
     header: {
-        marginBottom: 24,
+        marginBottom: 20,
         alignItems: 'center',
     },
     name: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#000000',
-        marginBottom: 8,
+        fontSize: 24,
+        fontWeight: 'bold', // Helvetica-Bold
+        color: '#000000', // Black
+        marginBottom: 5,
         // textTransform: 'uppercase', // Removed to match reference
     },
     contactLine: {
         flexDirection: 'row',
         justifyContent: 'center',
+        display: 'flex',
         alignItems: 'center',
         flexWrap: 'wrap',
         // gap: 4, // Removed to rely on separator margins and avoid assymetry
@@ -43,40 +42,40 @@ const styles = StyleSheet.create({
     contactItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 2,
+        marginBottom: 2, // Space between wrapped lines
     },
     contactText: {
-        fontSize: 9,
-        color: '#444',
+        fontSize: 7.5, // Slightly smaller to help fit one line
+        color: '#555',
     },
     link: {
         textDecoration: 'none',
-        color: '#444',
-        fontSize: 9,
+        color: '#555',
     },
     separator: {
-        marginHorizontal: 8, // Increased spacing
-        color: '#cbd5e1',
-        fontSize: 14, // Slightly larger dot
-        marginBottom: 2, // Optical alignment for the dot
+        marginHorizontal: 4, // Reduced from 8 to save space
+        color: '#94a3b8',
+        fontSize: 10,
     },
     icon: {
-        width: 10,
-        height: 10,
-        marginRight: 6, // More space between icon and text
-        color: '#64748b',
+        width: 9, // Reduced from 10
+        height: 9, // Reduced from 10
+        marginRight: 3, // Reduced from 4
+        color: '#555',
+        // Ensure icon is centered vertically with text
+        marginTop: 0,
     },
     section: {
-        marginBottom: 12,
+        marginBottom: 10,
     },
     sectionTitle: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: 'bold',
         color: '#1a5276',
         borderBottomWidth: 1.5,
         borderBottomColor: '#1a5276',
         textTransform: 'uppercase',
-        paddingBottom: 4,
+        paddingBottom: 2,
         marginBottom: 8,
         letterSpacing: 1,
     },
@@ -208,8 +207,8 @@ export default function ResumePDF({ resume }) {
     if (contact.city || contact.country) contactItems.push({ text: [contact.city, contact.country].filter(Boolean).join(', '), icon: 'location' });
     if (contact.email) contactItems.push({ text: contact.email, type: 'email', icon: 'email' });
     if (contact.phone) contactItems.push({ text: contact.phone, icon: 'phone' });
-    if (contact.linkedin) contactItems.push({ text: 'LinkedIn', href: contact.linkedin, type: 'link', icon: 'linkedin' });
-    if (contact.website) contactItems.push({ text: 'Portfolio', href: contact.website, type: 'link', icon: 'website' });
+    if (contact.linkedin) contactItems.push({ text: contact.linkedin.replace(/^https?:\/\/(www\.)?/, ''), href: contact.linkedin, type: 'link', icon: 'linkedin' });
+    if (contact.website) contactItems.push({ text: contact.website.replace(/^https?:\/\/(www\.)?/, ''), href: contact.website, type: 'link', icon: 'website' });
 
     const renderSummary = () => summary && (
         <View style={styles.section}>
