@@ -2,11 +2,13 @@
 import React from 'react';
 import { Page, Text, View, Document, StyleSheet, Link, Svg, Path, Circle, Rect, Line, Font } from '@react-pdf/renderer';
 
-// Register a font if needed, otherwise use Helvetica
+// Register Merriweather font
 Font.register({
-    family: 'Helvetica',
+    family: 'Merriweather',
     fonts: [
-        { src: 'https://fonts.gstatic.com/s/helveticaneue/v70/1Ptsg8zYS_SKggPNyC0IT4ttDfA.ttf' }, // Fallback or use standard
+        { src: 'https://fonts.gstatic.com/s/merriweather/v30/u-4n0qyriQwlOrhSvowK_l52_wfzU1I.ttf', fontWeight: 'normal' },
+        { src: 'https://fonts.gstatic.com/s/merriweather/v30/u-4l0qyriQwlOrhSvowK_l5-eR7lXffpTPw.ttf', fontWeight: 'bold' },
+        { src: 'https://fonts.gstatic.com/s/merriweather/v30/u-4m0qyriQwlOrhSvowK_l5-ycZlYf0.ttf', fontStyle: 'italic' },
     ]
 });
 
@@ -14,27 +16,26 @@ Font.register({
 const styles = StyleSheet.create({
     page: {
         padding: 30, // ~10mm
-        fontFamily: 'Helvetica',
+        fontFamily: 'Merriweather',
         fontSize: 10,
-        lineHeight: 1.5,
+        lineHeight: 1.6,
         color: '#333',
-        backgroundColor: '#ffffff', // Ensure white background
+        backgroundColor: '#ffffff',
     },
     header: {
-        marginBottom: 20,
+        marginBottom: 24,
         alignItems: 'center',
     },
     name: {
-        fontSize: 18,
-        fontWeight: 'bold', // Helvetica-Bold
-        color: '#000000', // Black
-        marginBottom: 4,
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#000000',
+        marginBottom: 8,
         // textTransform: 'uppercase', // Removed to match reference
     },
     contactLine: {
         flexDirection: 'row',
         justifyContent: 'center',
-        display: 'flex',
         alignItems: 'center',
         flexWrap: 'wrap',
         // gap: 4, // Removed to rely on separator margins and avoid assymetry
@@ -42,41 +43,40 @@ const styles = StyleSheet.create({
     contactItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 1,
+        marginBottom: 2,
     },
     contactText: {
-        fontSize: 8,
+        fontSize: 9,
         color: '#444',
     },
     link: {
         textDecoration: 'none',
         color: '#444',
-        fontSize: 8,
+        fontSize: 9,
     },
     separator: {
-        marginHorizontal: 5,
+        marginHorizontal: 8, // Increased spacing
         color: '#cbd5e1',
-        fontSize: 12,
-        marginTop: -2, // Slight visual tweak for bullet alignment
+        fontSize: 14, // Slightly larger dot
+        marginBottom: 2, // Optical alignment for the dot
     },
     icon: {
         width: 10,
         height: 10,
-        marginRight: 4,
+        marginRight: 6, // More space between icon and text
         color: '#64748b',
-        marginTop: -1, // Lift icon slightly to align with text baseline
     },
     section: {
-        marginBottom: 10,
+        marginBottom: 12,
     },
     sectionTitle: {
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: 'bold',
         color: '#1a5276',
         borderBottomWidth: 1.5,
         borderBottomColor: '#1a5276',
         textTransform: 'uppercase',
-        paddingBottom: 2,
+        paddingBottom: 4,
         marginBottom: 8,
         letterSpacing: 1,
     },
